@@ -35,26 +35,16 @@ $mayarId = new \ReactMoreTech\MayarHeadlessAPI\MayarProvider([
 See Example on [WIKI](https://github.com/reactmore-tech/mayar-headless-api/wiki):
 
 - [ ] Product
-  - [ ] Product Page
-  - [ ] Product Page with Type Filter
-  - [ ] Search Product
-  - [ ] Detail Product
-  - [ ] Close Product
-  - [ ] Re-open Product
 - [ ] Invoice
 - [ ] Request Payment
 - [ ] Installment
 - [ ] Discount & Coupon
 - [ ] Cart
 - [X] Customer
-- [ ] Transaction
+- [X] Transaction
 - [X] Webhook
-  - [X] Get History
-  - [X] Register URL Webhook
-  - [X] Test URL Webhook
-  - [X] Retry URL Webhook
 - [X] Software License Code
-- [ ] SaaS Membership License
+- [X] SaaS Membership License
 
 Note that this repository is currently under development, additional classes and endpoints being actively added.
 

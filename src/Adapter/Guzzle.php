@@ -105,12 +105,20 @@ class Guzzle implements AdapterInterface
             throw new InvalidArgumentException('Request method must be get, post, put, patch, or delete');
         }
 
+        if (isset($data['json'])) {
+            $headers['Content-Type'] = 'application/json';
+        }
+
         $options = [
             'headers' => $headers,
         ];
 
         if ($method === 'get') {
-            $options['query'] = $data;
+            if (isset($data['json'])) {
+                $options['json'] = $data['json'];
+            } else {
+                $options['query'] = $data;
+            }
         } elseif ($method === 'post' || $method === 'put' || $method === 'patch' || $method === 'delete') {
             if (isset($data['json'])) {
                 $options['json'] = $data['json'];

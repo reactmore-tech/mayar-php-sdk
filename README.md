@@ -38,7 +38,7 @@ See Example on [WIKI](https://github.com/reactmore-tech/mayar-headless-api/wiki)
 - [ ] Invoice
 - [ ] Request Payment
 - [ ] Installment
-- [ ] Discount & Coupon
+- [X] Discount & Coupon
 - [ ] Cart
 - [X] Customer
 - [X] Transaction

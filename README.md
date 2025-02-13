@@ -19,7 +19,7 @@ Support:
 - [ ] Installment
 - [ ] DIscount & Coupon
 - [ ] Cart
-- [ ] Customer
+- [X] Customer
 - [ ] Transaction
 - [X] Webhook
   - [X] Get History

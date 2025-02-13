@@ -9,7 +9,10 @@ use ReactMoreTech\MayarHeadlessAPI\Services\Traits\BodyAccessorTrait;
 use GuzzleHttp\Exception\RequestException;
 
 /**
- * Webhook Services for v1 Mayar Headless API
+ * Webhook for Mayar Headless API V1
+ *
+ * This service handles webhook operations, including retrieving webhook history,
+ * registering a webhook URL, testing the webhook, and retrying webhook events.
  *
  * @package ReactMoreTech\MayarHeadlessAPI\Services\V1
  */
@@ -18,14 +21,16 @@ class WebhookServices implements ServiceInterface
     use BodyAccessorTrait;
 
     /**
-     * @var AdapterInterface $adapter HTTP adapter to use for the service
+     * HTTP adapter for API communication.
+     *
+     * @var AdapterInterface
      */
     private $adapter;
 
     /**
-     * WebhookServices constructor.
+     * Webhook Services constructor.
      *
-     * @param AdapterInterface $adapter HTTP adapter to use for the service
+     * @param AdapterInterface $adapter HTTP adapter instance.
      */
     public function __construct(AdapterInterface $adapter)
     {
@@ -33,9 +38,11 @@ class WebhookServices implements ServiceInterface
     }
 
     /**
-     * Get Webhook History
+     * Retrieve webhook history.
      *
-     * @throws \Exception If request fails for any reason.
+     * @param array $data Query parameters such as page, pageSize, status, type, etc.
+     * @return array The response containing webhook history data.
+     * @throws \Exception If request fails.
      */
     public function getWebhookHistory(array $data = [])
     {
@@ -48,10 +55,10 @@ class WebhookServices implements ServiceInterface
     }
 
     /**
-     * Register Webhook URL
+     * Register a webhook URL.
      *
-     * @param string|null $url
-     * @return array
+     * @param string|null $url The URL to register for webhook events.
+     * @return array The response indicating success or failure.
      */
     public function setWebhookURL(string $url = null)
     {
@@ -64,10 +71,10 @@ class WebhookServices implements ServiceInterface
     }
 
     /**
-     * Test Webhook URL
+     * Test a registered webhook URL.
      *
-     * @param string|null $url
-     * @return array
+     * @param string|null $url The webhook URL to test.
+     * @return array The response indicating success or failure.
      */
     public function testWebhookURL(string $url = null)
     {
@@ -80,10 +87,10 @@ class WebhookServices implements ServiceInterface
     }
     
     /**
-     * Retry Webhook URL
+     * Retry a failed webhook event.
      *
-     * @param string|null $url
-     * @return array
+     * @param string|null $webhookHistoryId The ID of the webhook event to retry.
+     * @return array The response indicating success or failure.
      */
     public function retryWebhookURL(string $webhookHistoryId = null)
     {
@@ -96,10 +103,10 @@ class WebhookServices implements ServiceInterface
     }
 
     /**
-     * Handle API exceptions
+     * Handle API exceptions and format error responses.
      *
-     * @param RequestException $e
-     * @return array
+     * @param RequestException $e The exception thrown during the request.
+     * @return array The formatted error response.
      */
     private function handleException(RequestException $e)
     {
@@ -109,7 +116,7 @@ class WebhookServices implements ServiceInterface
 
         if ($responseBody) {
             $errorData = json_decode($responseBody, true);
-            $errorMessage = $errorData['messages'] ?? 'Terjadi kesalahan';
+            $errorMessage = $errorData['messages'] ?? 'An error occurred';
             return ResponseFormatter::formatErrorResponse($errorMessage, $statusCode);
         }
 

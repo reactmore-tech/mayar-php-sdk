@@ -9,7 +9,10 @@ use ReactMoreTech\MayarHeadlessAPI\Services\Traits\BodyAccessorTrait;
 use GuzzleHttp\Exception\RequestException;
 
 /**
- * Customer Mayar Headless API V1
+ * Customer Service for Mayar Headless API V1
+ *
+ * Provides functionalities for managing customer data, including retrieval,
+ * creation, updating, and generating magic links.
  *
  * @package ReactMoreTech\MayarHeadlessAPI\Services\V1
  */
@@ -18,14 +21,16 @@ class Customer implements ServiceInterface
     use BodyAccessorTrait;
 
     /**
-     * @var AdapterInterface $adapter HTTP adapter to use for the service
+     * HTTP adapter for API communication.
+     *
+     * @var AdapterInterface
      */
     private $adapter;
 
     /**
      * Customer constructor.
      *
-     * @param AdapterInterface $adapter HTTP adapter to use for the service
+     * @param AdapterInterface $adapter HTTP adapter instance.
      */
     public function __construct(AdapterInterface $adapter)
     {
@@ -33,13 +38,11 @@ class Customer implements ServiceInterface
     }
 
     /**
-     * Get List Customer
-     * 
-     * Get your customer data
+     * Retrieve a list of customers.
      *
-     * @param array $data The data containing page (string) and pageSize (string).
-     * @return ResponseFormatter
-     * @throws \Exception If request fails for any reason.
+     * @param array $data Contains optional parameters such as 'page' and 'pageSize'.
+     * @return array The formatted API response containing customer data.
+     * @throws \Exception If the request fails.
      */
     public function getList(array $data = [])
     {
@@ -52,12 +55,12 @@ class Customer implements ServiceInterface
     }
 
     /**
-     * Create Magic Link
+     * Generate a magic link for customer login.
      *
-     * create magic link and send to customer email for their login in our customer portal
+     * Sends a magic link to the customer's email to allow login to the customer portal.
      *
-     * @param string|null $email
-     * @return ResponseFormatter
+     * @param string|null $email Customer email to receive the magic link.
+     * @return array The formatted API response.
      */
     public function createMagicLink(string $email = null)
     {
@@ -70,10 +73,10 @@ class Customer implements ServiceInterface
     }
 
     /**
-     * Create Customer Data
+     * Create a new customer record.
      *
-     * @param array $data The data containing name (string), email (string), and mobile (string).
-     * @return ResponseFormatter
+     * @param array $data Contains required fields: 'name' (string), 'email' (string), and 'mobile' (string).
+     * @return array The formatted API response.
      */
     public function create(array $data = [])
     {
@@ -86,10 +89,10 @@ class Customer implements ServiceInterface
     }
 
     /**
-     * Update Customer Data
+     * Update an existing customer record.
      *
-     * @param array $data The data containing fromEmail (string) and toEmail (string).
-     * @return ResponseFormatter
+     * @param array $data Contains required fields: 'fromEmail' (string) and 'toEmail' (string).
+     * @return array The formatted API response.
      */
     public function update(array $data = [])
     {
@@ -102,10 +105,10 @@ class Customer implements ServiceInterface
     }
 
     /**
-     * Handle API exceptions
+     * Handle API request exceptions.
      *
-     * @param RequestException $e
-     * @return array
+     * @param RequestException $e The caught exception.
+     * @return array Formatted error response with status code.
      */
     private function handleException(RequestException $e)
     {
@@ -115,7 +118,7 @@ class Customer implements ServiceInterface
 
         if ($responseBody) {
             $errorData = json_decode($responseBody, true);
-            $errorMessage = $errorData['messages'] ?? 'Terjadi kesalahan';
+            $errorMessage = $errorData['messages'] ?? 'An error occurred';
             return ResponseFormatter::formatErrorResponse($errorMessage, $statusCode);
         }
 

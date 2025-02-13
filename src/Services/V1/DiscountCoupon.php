@@ -9,14 +9,14 @@ use ReactMoreTech\MayarHeadlessAPI\Services\Traits\BodyAccessorTrait;
 use GuzzleHttp\Exception\RequestException;
 
 /**
- * Webhook for Mayar Headless API V1
+ * Discount and Coupon for Mayar Headless API V1
  *
  * This service handles webhook operations, including retrieving webhook history,
  * registering a webhook URL, testing the webhook, and retrying webhook events.
  *
  * @package ReactMoreTech\MayarHeadlessAPI\Services\V1
  */
-class WebhookServices implements ServiceInterface
+class DiscountCoupon implements ServiceInterface
 {
     use BodyAccessorTrait;
 
@@ -28,7 +28,7 @@ class WebhookServices implements ServiceInterface
     private $adapter;
 
     /**
-     * Webhook Services constructor.
+     * Discount and Coupon Services constructor.
      *
      * @param AdapterInterface $adapter HTTP adapter instance.
      */
@@ -38,16 +38,18 @@ class WebhookServices implements ServiceInterface
     }
 
     /**
-     * Retrieve webhook history.
+     * Create Coupon.
      *
-     * @param array $data Query parameters such as page, pageSize, status, type, etc.
-     * @return array The response containing webhook history data.
+     * @param array $payoload payload required for this endpoint.
+     * @return object The response containing webhook history data.
      * @throws \Exception If request fails.
      */
-    public function getWebhookHistory(array $data = [])
+    public function create(array $payload = [])
     {
         try {
-            $request = $this->adapter->get('hl/v1/webhook/history', $data);
+            $request = $this->adapter->post('hl/v1/coupon/create', [
+                'json' => $payload
+            ]);
             return ResponseFormatter::formatResponse($request->getBody());
         } catch (RequestException $e) {
             return $this->handleException($e);
@@ -55,47 +57,16 @@ class WebhookServices implements ServiceInterface
     }
 
     /**
-     * Register a webhook URL.
+     * Retrieve Coupon by ID.
      *
-     * @param string|null $url The URL to register for webhook events.
-     * @return array The response indicating success or failure.
+     * @param array $id parameter to added in URL.
+     * @return object The response containing webhook history data.
+     * @throws \Exception If request fails.
      */
-    public function setWebhookURL(string $url = null)
+    public function getCoupon(string $couponId)
     {
         try {
-            $request = $this->adapter->post("hl/v1/webhook/register", ['urlHook' => $url]);
-            return ResponseFormatter::formatResponse($request->getBody());
-        } catch (RequestException $e) {
-            return $this->handleException($e);
-        }
-    }
-
-    /**
-     * Test a registered webhook URL.
-     *
-     * @param string|null $url The webhook URL to test.
-     * @return array The response indicating success or failure.
-     */
-    public function testWebhookURL(string $url = null)
-    {
-        try {
-            $request = $this->adapter->post("hl/v1/webhook/test", ['urlHook' => $url]);
-            return ResponseFormatter::formatResponse($request->getBody());
-        } catch (RequestException $e) {
-            return $this->handleException($e);
-        }
-    }
-    
-    /**
-     * Retry a failed webhook event.
-     *
-     * @param string|null $webhookHistoryId The ID of the webhook event to retry.
-     * @return array The response indicating success or failure.
-     */
-    public function retryWebhookURL(string $webhookHistoryId = null)
-    {
-        try {
-            $request = $this->adapter->post("hl/v1/webhook/retry", ['webhookHistoryId' => $webhookHistoryId]);
+            $request = $this->adapter->get("hl/v1/coupon/{$couponId}");
             return ResponseFormatter::formatResponse($request->getBody());
         } catch (RequestException $e) {
             return $this->handleException($e);

@@ -16,7 +16,7 @@ class ResponseFormatter
      *
      * @param string $responseBody
      * @param string|null $message
-     * @return array
+     * @return ApiResponse
      */
     public static function formatResponse($responseBody, $message = null)
     {
@@ -29,12 +29,21 @@ class ResponseFormatter
             );
         }
 
-        return [
+        // Ambil data paginasi jika ada di response
+        $paginationKeys = ['hasMore', 'pageCount', 'pageSize', 'page'];
+        $paginationData = [];
+        foreach ($paginationKeys as $key) {
+            if (isset($response[$key])) {
+                $paginationData[$key] = $response[$key];
+            }
+        }
+
+        return new ApiResponse(array_merge([
             'success' => true,
-            'message' => $message ?? 'Request berhasil',
-            'data' => $response,
+            'message' => $response['messages'] ?? ($message ?? 'Request berhasil'),
+            'data' => $response['data'] ?? [],
             'status_code' => $response['statusCode'] ?? 200,
-        ];
+        ], $paginationData));
     }
 
     /**
@@ -46,11 +55,11 @@ class ResponseFormatter
      */
     public static function formatErrorResponse($message, $statusCode = 500)
     {
-        return [
+        return new ApiResponse([
             'success' => false,
             'message' => $message,
             'data' => null,
             'status_code' => $statusCode,
-        ];
+        ]);
     }
 }

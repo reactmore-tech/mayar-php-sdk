@@ -21,10 +21,9 @@ class Guzzle implements AdapterInterface
      */
     private $client;
 
-    const PRODUCTION_BASE_URI = 'https://api.mayar.id/hl/';
+    const PRODUCTION_BASE_URI = 'https://api.mayar.id/';
 
-    const SANDBOX_BASE_URI = 'https://api.mayar.club/hl/';
-    
+    const SANDBOX_BASE_URI = 'https://api.mayar.club/';
 
     /**
      * Create a new Guzzle instance.

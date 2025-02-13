@@ -40,7 +40,7 @@ class WebhookServices implements ServiceInterface
     public function getWebhookHistory(array $data = [])
     {
         try {
-            $request = $this->adapter->get('v1/webhook/history', $data);
+            $request = $this->adapter->get('hl/v1/webhook/history', $data);
             return ResponseFormatter::formatResponse($request->getBody());
         } catch (RequestException $e) {
             return $this->handleException($e);
@@ -56,7 +56,7 @@ class WebhookServices implements ServiceInterface
     public function setWebhookURL(string $url = null)
     {
         try {
-            $request = $this->adapter->post("v1/webhook/register", ['urlHook' => $url]);
+            $request = $this->adapter->post("hl/v1/webhook/register", ['urlHook' => $url]);
             return ResponseFormatter::formatResponse($request->getBody());
         } catch (RequestException $e) {
             return $this->handleException($e);
@@ -72,7 +72,7 @@ class WebhookServices implements ServiceInterface
     public function testWebhookURL(string $url = null)
     {
         try {
-            $request = $this->adapter->post("v1/webhook/test", ['urlHook' => $url]);
+            $request = $this->adapter->post("hl/v1/webhook/test", ['urlHook' => $url]);
             return ResponseFormatter::formatResponse($request->getBody());
         } catch (RequestException $e) {
             return $this->handleException($e);
@@ -88,7 +88,7 @@ class WebhookServices implements ServiceInterface
     public function retryWebhookURL(string $webhookHistoryId = null)
     {
         try {
-            $request = $this->adapter->post("v1/webhook/retry", ['webhookHistoryId' => $webhookHistoryId]);
+            $request = $this->adapter->post("hl/v1/webhook/retry", ['webhookHistoryId' => $webhookHistoryId]);
             return ResponseFormatter::formatResponse($request->getBody());
         } catch (RequestException $e) {
             return $this->handleException($e);
@@ -107,14 +107,12 @@ class WebhookServices implements ServiceInterface
         $statusCode = $response ? $response->getStatusCode() : 500;
         $responseBody = $response ? $response->getBody()->getContents() : null;
 
-        // Jika API memberikan response, gunakan itu
         if ($responseBody) {
             $errorData = json_decode($responseBody, true);
             $errorMessage = $errorData['messages'] ?? 'Terjadi kesalahan';
             return ResponseFormatter::formatErrorResponse($errorMessage, $statusCode);
         }
 
-        // Jika tidak ada response, gunakan pesan bawaan exception
         return ResponseFormatter::formatErrorResponse($e->getMessage(), $statusCode);
     }
 }

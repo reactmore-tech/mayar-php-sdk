@@ -1,11 +1,38 @@
 # Mayar.id Unofficial SDK PHP
+[![Latest Version](https://img.shields.io/github/release/reactmore-tech/mayar-headless-api.svg?style=flat-square)](https://github.com/reactmore-tech/mayar-headless-api/releases)
+[![MIT Licensed](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE.md)
+[![Total Downloads](https://img.shields.io/packagist/dt/reactmore-tech/mayar-headless-api.svg?style=flat-square)](https://packagist.org/packages/reactmore-tech/mayar-headless-api)
 
 ## Installation
 
+```cli
+composer require reactmore-tech/mayar-headless-api
+```
 
-## Mayar Headless API 
+## Usage
 
-Support:
+```php
+require 'vendor/autoload.php';
+
+$mayarId = new \ReactMoreTech\MayarHeadlessAPI\MayarProvider();
+$mayarId->setProduction(false);
+$mayarId->apiToken("xxxx");
+$mayarId->webhookToken("xxxxxx");
+```
+
+OR
+
+```php
+$mayarId = new \ReactMoreTech\MayarHeadlessAPI\MayarProvider([
+  'apiToken' => "xxxxxxxxxxxxx",
+  'webhookToken' => "xxxxxxxxxxx",
+  'isProduction' => false,
+]);
+```
+
+## Mayar Headless API Example Method in WIKI
+
+See Example on [WIKI](https://github.com/reactmore-tech/mayar-headless-api/wiki):
 
 - [ ] Product
   - [ ] Product Page
@@ -17,13 +44,13 @@ Support:
 - [ ] Invoice
 - [ ] Request Payment
 - [ ] Installment
-- [ ] DIscount & Coupon
+- [ ] Discount & Coupon
 - [ ] Cart
 - [X] Customer
 - [ ] Transaction
 - [X] Webhook
   - [X] Get History
-  - [X] Regiter URL Webhook
+  - [X] Register URL Webhook
   - [X] Test URL Webhook
   - [X] Retry URL Webhook
 - [X] Software License Code
@@ -33,7 +60,7 @@ Note that this repository is currently under development, additional classes and
 
 ## Contributions
 
-We welcome community contribution to this repository. will help you start contributing.
+We welcome community contributions to this repository. Please refer to the contribution guidelines to get started.
 
 ## Licensing
 

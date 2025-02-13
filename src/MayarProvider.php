@@ -33,12 +33,18 @@ class MayarProvider
     private $isProduction;
 
     /**
+     * @var string
+     */
+    private $version;
+
+    /**
      * MayarProvider constructor.
      * @param array $options
      */
     public function __construct(array $options = [])
     {
         $this->isProduction = $options['isProduction'] ?? true;
+        $this->version = $options['version'] ?? 'V1';
 
         if (!empty($options['apiToken'])) {
             $this->apiToken($options['apiToken']);
@@ -47,6 +53,15 @@ class MayarProvider
         if (!empty($options['webhookToken'])) {
             $this->webhookToken($options['webhookToken']);
         }
+    }
+
+    public function setVersion(string $version): void
+    {
+        $allowedVersions = ['V1', 'V2'];
+        if (!in_array($version, $allowedVersions, true)) {
+            throw new \InvalidArgumentException("Versi tidak valid: {$version}. Gunakan V1 atau V2.");
+        }
+        $this->version = $version;
     }
 
     /**
@@ -97,13 +112,15 @@ class MayarProvider
         }
     }
 
-    /**
-     * Get instance of Webhook service.
-     *
-     * @return \ReactMoreTech\MayarHeadlessAPI\Services\V1\WebhookServices
-     */
-    public function webhookServices(): ServiceInterface
+
+    public function __call($name, $arguments)
     {
-        return new \ReactMoreTech\MayarHeadlessAPI\Services\V1\WebhookServices($this->adapter);
+        $className = "\\ReactMoreTech\\MayarHeadlessAPI\\Services\\{$this->version}\\" . ucfirst($name);
+
+        if (class_exists($className)) {
+            return new $className($this->adapter);
+        }
+
+        throw new \BadMethodCallException("Service {$name} Not Found on {$this->version}.");
     }
 }

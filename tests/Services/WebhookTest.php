@@ -4,49 +4,85 @@ namespace ReactMoreTech\MayarHeadlessAPI\Tests\Services;
 
 use ReactMoreTech\MayarHeadlessAPI\Tests\TestCase;
 use ReactMoreTech\MayarHeadlessAPI\Services\V1\WebhookServices;
+use ReactMoreTech\MayarHeadlessAPI\Helper\ApiResponse;
 
+/**
+ * Test cases for Webhook Services.
+ */
 class WebhookTest extends TestCase
 {
-    public function testGetWebhookHistory()
+    /**
+     * Test retrieving webhook history.
+     *
+     * @return void
+     */
+    public function testGetWebhookHistory(): void
     {
         $result = $this->requestMock->webhookServices()->getWebhookHistory();
-    
-        $this->assertArrayHasKey('success', $result);
-        $this->assertArrayHasKey('data', $result);
-        $this->assertArrayHasKey('status_code', $result);
-    
-        $this->assertTrue($result['success']); // Inilah yang gagal
-    }
-    
 
-    public function testSetWebhookURL()
+        // Ensure the response is an instance of ApiResponse
+        $this->assertInstanceOf(ApiResponse::class, $result);
+
+        // Convert response to array format
+        $responseArray = $result->toArray();
+
+        // Validate response structure
+        $this->assertArrayHasKey('success', $responseArray);
+        $this->assertArrayHasKey('data', $responseArray);
+        $this->assertArrayHasKey('status_code', $responseArray);
+
+        // Ensure success is true
+        $this->assertTrue($responseArray['success']);
+    }
+
+    /**
+     * Test setting a valid webhook URL.
+     *
+     * @return void
+     */
+    public function testSetWebhookURL(): void
     {
         $validURL = "https://example.com/webhook";
 
         $result = $this->requestMock->webhookServices()->setWebhookURL($validURL);
 
-        // Pastikan response mengandung data yang benar
-        $this->assertArrayHasKey('success', $result);
-        $this->assertArrayHasKey('data', $result);
-        $this->assertArrayHasKey('status_code', $result);
+        // Ensure the response is an instance of ApiResponse
+        $this->assertInstanceOf(ApiResponse::class, $result);
 
-        // Cek apakah request berhasil
-        $this->assertTrue($result['success']);
+        $responseArray = $result->toArray();
+
+        // Validate response structure
+        $this->assertArrayHasKey('success', $responseArray);
+        $this->assertArrayHasKey('data', $responseArray);
+        $this->assertArrayHasKey('status_code', $responseArray);
+
+        // Ensure request was successful
+        $this->assertTrue($responseArray['success']);
     }
 
-    public function testSetInvalidWebhookURL()
+    /**
+     * Test setting an invalid webhook URL.
+     *
+     * @return void
+     */
+    public function testSetInvalidWebhookURL(): void
     {
         $invalidURL = "invalid_url";
 
         $result = $this->requestMock->webhookServices()->setWebhookURL($invalidURL);
 
-        // Pastikan response error memiliki format yang benar
-        $this->assertArrayHasKey('success', $result);
-        $this->assertArrayHasKey('message', $result);
-        $this->assertArrayHasKey('status_code', $result);
+        // Ensure the response is an instance of ApiResponse
+        $this->assertInstanceOf(ApiResponse::class, $result);
 
-        // Pastikan success false untuk invalid URL
-        $this->assertFalse($result['success']);
-        $this->assertEquals(400, $result['status_code']);
+        $responseArray = $result->toArray();
+
+        // Validate response structure
+        $this->assertArrayHasKey('success', $responseArray);
+        $this->assertArrayHasKey('message', $responseArray);
+        $this->assertArrayHasKey('status_code', $responseArray);
+
+        // Ensure success is false for an invalid URL
+        $this->assertFalse($responseArray['success']);
+        $this->assertEquals(400, $responseArray['status_code']);
     }
 }

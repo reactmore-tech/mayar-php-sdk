@@ -1,0 +1,39 @@
+{
+    "name": "reactmore-tech/mayar-headless-api",
+    "description": "[unofficial] Mayar.id Headless API | https://mayar.id",
+    "version": "1.0.0",
+    "license": "MIT",
+    "keywords": [
+        "Mayar",
+        "mayar.id",
+        "Mayar Payment Gateway"
+    ],
+    "homepage": "https://github.com/reactmore-tech/mayar-headless-api",
+    "type": "library",
+    "minimum-stability": "stable",
+    "require": {
+        "php": "^7.4 || ^8.0",
+        "guzzlehttp/guzzle": "^7.0.1",
+        "psr/http-message": "~1.0",
+        "ext-json": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "ReactMoreTech\\MayarHeadlessAPI\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "ReactMoreTech\\MayarHeadlessAPI\\Tests\\": "tests/"
+        }
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9",
+        "squizlabs/php_codesniffer": "^3.7.2",
+        "kint-php/kint": "^5.0"
+    },
+    "scripts": {
+        "test": "phpunit",
+        "test_debug": "phpunit --debug"
+    }
+}

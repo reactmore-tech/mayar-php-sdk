@@ -6,3 +6,4 @@ build
 .phpunit.result.cache
 index.php
 .vscode
+composer.lock

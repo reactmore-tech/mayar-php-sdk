@@ -1,7 +1,6 @@
 {
     "name": "reactmore-tech/mayar-headless-api",
     "description": "[unofficial] Mayar.id Headless API | https://mayar.id",
-    "version": "1.0.0",
     "license": "MIT",
     "keywords": [
         "Mayar",

@@ -41,7 +41,7 @@ class ResponseFormatter
         return new ApiResponse(array_merge([
             'success' => true,
             'message' => $response['messages'] ?? ($message ?? 'Request berhasil'),
-            'data' => $response['data'] ?? [],
+            'data' => $response['data'] ?? NULL,
             'status_code' => $response['statusCode'] ?? 200,
         ], $paginationData));
     }

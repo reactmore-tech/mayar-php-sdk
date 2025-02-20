@@ -93,6 +93,10 @@ class Installment implements ServiceInterface
                 'json' => $payload
             ]);
             return ResponseFormatter::formatResponse($request->getBody());
+        } catch (MissingArguements $e) {
+            return ResponseFormatter::formatErrorResponse($e->getMessage(), 400);
+        } catch (InvalidContentType $e) {
+            return ResponseFormatter::formatErrorResponse($e->getMessage(), 400);
         } catch (RequestException $e) {
             return $this->handleException($e);
         }

@@ -30,6 +30,17 @@ class Validator
         }
     }
 
+    public static function validateCreateInstallment(array $payload)
+    {
+        MainValidator::validateContentFields($payload, ['email', 'mobile', 'name', 'amount', 'installment']);
+        MainValidator::validateNestedFields($payload, 'installment', [
+            'description',
+            'interest',
+            'tenure',
+            'dueDate'
+        ]);
+    }
+
     public static function validateSingleArgument($argument, $fieldName)
     {
         MainValidator::validateSingleArgument($argument, $fieldName);

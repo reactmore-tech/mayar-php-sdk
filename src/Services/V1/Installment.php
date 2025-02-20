@@ -6,12 +6,16 @@ use ReactMoreTech\MayarHeadlessAPI\Adapter\AdapterInterface;
 use ReactMoreTech\MayarHeadlessAPI\Helper\ResponseFormatter;
 use ReactMoreTech\MayarHeadlessAPI\Services\ServiceInterface;
 use ReactMoreTech\MayarHeadlessAPI\Services\Traits\BodyAccessorTrait;
+use ReactMoreTech\MayarHeadlessAPI\Helper\Validations\Validator;
+use ReactMoreTech\MayarHeadlessAPI\Exceptions\InvalidContentType;
+use ReactMoreTech\MayarHeadlessAPI\Exceptions\MissingArguements;
 use GuzzleHttp\Exception\RequestException;
 
 /**
  * Installment Service for Mayar Headless API V1
  *
- * Create and Check Installment api
+ * Provides functionalities for managing Installment,
+ * creation, and Show detail installment data.
  *
  * @package ReactMoreTech\MayarHeadlessAPI\Services\V1
  */
@@ -29,6 +33,8 @@ class Installment implements ServiceInterface
     /**
      * Installment Service constructor.
      *
+     * Initializes the Customer service with the provided HTTP adapter.
+     *
      * @param AdapterInterface $adapter HTTP adapter instance.
      */
     public function __construct(AdapterInterface $adapter)
@@ -37,35 +43,52 @@ class Installment implements ServiceInterface
     }
 
     /**
-     * installment Detail
+     * Get Installment Detail by ID.
      *
-     * @return object The formatted API response Installment Detail.
+     * Retrieves the details of a specific Installmentby its unique identifier. 
+     *
+     * @param string $installmentId Required parameters (string).
+     * @return ResponseFormatter Formatted API response.
      * @throws \Exception If the request fails.
      */
     public function detail(string $installmentId)
     {
         try {
+            Validator::validateSingleArgument($installmentId, 'installmentId');
             $request = $this->adapter->get("hl/v1/installment/{$installmentId}");
             return ResponseFormatter::formatResponse($request->getBody());
+        } catch (MissingArguements $e) {
+            return ResponseFormatter::formatErrorResponse($e->getMessage(), 400);
+        } catch (InvalidContentType $e) {
+            return ResponseFormatter::formatErrorResponse($e->getMessage(), 400);
         } catch (RequestException $e) {
             return $this->handleException($e);
         }
     }
 
     /**
-     * Installment Create.
+     * Create a new installment.
      *
-     * endpoint to cretae installment. All field in payload ar mandatory if we dont describe, 
-     * its optional
-     * 
-     * @param array $payload Contains the installment data.
+     * Generates a installment for new customers with customizable properties,
      *
-     * @return object The formatted API response containing customer data.
+     * @param array $payload Required parameters:
+     *  - 'email' (string) Email Customer.
+     *  - 'mobile' (string) Mobile Phone Customer:
+     *  - 'name' (string) Name Customer:
+     *  - 'amount' (int) Amount Installment:
+     *  - 'installment' (array) installment details:
+     *    - 'description' (string) Description Installment".
+     *    - 'interest' (int) interest percetage".
+     *    - 'tenure' (int) installment tenor".
+     *    - 'dueDate' (int) Installment Due Date".
+     *
+     * @return ResponseFormatter Formatted API response.
      * @throws \Exception If the request fails.
      */
     public function create(array $payload)
     {
         try {
+            Validator::validateCreateInstallment($payload);
             $request = $this->adapter->post("hl/v1/installment/create", [
                 'json' => $payload
             ]);
@@ -78,8 +101,11 @@ class Installment implements ServiceInterface
     /**
      * Handle API request exceptions.
      *
+     * Processes and formats exceptions that occur during API requests,
+     * returning a structured error response.
+     *
      * @param RequestException $e The caught exception.
-     * @return object Formatted error response with status code.
+     * @return array Formatted error response with status code.
      */
     private function handleException(RequestException $e)
     {

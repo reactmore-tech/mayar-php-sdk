@@ -6,6 +6,9 @@ use ReactMoreTech\MayarHeadlessAPI\Adapter\AdapterInterface;
 use ReactMoreTech\MayarHeadlessAPI\Helper\ResponseFormatter;
 use ReactMoreTech\MayarHeadlessAPI\Services\ServiceInterface;
 use ReactMoreTech\MayarHeadlessAPI\Services\Traits\BodyAccessorTrait;
+use ReactMoreTech\MayarHeadlessAPI\Helper\Validations\Validator;
+use ReactMoreTech\MayarHeadlessAPI\Exceptions\InvalidContentType;
+use ReactMoreTech\MayarHeadlessAPI\Exceptions\MissingArguements;
 use GuzzleHttp\Exception\RequestException;
 
 /**
@@ -22,16 +25,16 @@ class SoftwareLicenseCode implements ServiceInterface
     use BodyAccessorTrait;
 
     /**
-     * HTTP adapter instance.
+     * HTTP adapter for API communication.
      *
      * @var AdapterInterface
      */
     private $adapter;
 
     /**
-     * Constructor for SoftwareLicenseCode Service.
+     * Software License Code Service constructor.
      *
-     * @param AdapterInterface $adapter The HTTP adapter for making requests.
+     * @param AdapterInterface $adapter HTTP adapter instance.
      */
     public function __construct(AdapterInterface $adapter)
     {
@@ -44,31 +47,35 @@ class SoftwareLicenseCode implements ServiceInterface
      * This endpoint is used to verify the validity of a software license
      * by providing a license code and product ID.
      *
-     * @param array $data The request payload containing:
-     *                    - licenseCode (string): The license code to verify.
-     *                    - productId (string): The product ID associated with the license.
-     * @return array The API response containing the license status and details.
-     *
-     * @throws RequestException If the request fails due to network issues or API errors.
+     * @param array $data Required parameters:
+     *  - 'licenseCode' (string) The license code to verify.
+     *  - 'productId' (string) The product ID associated with the license.
+     * @return ResponseFormatter Formatted API response.
+     * @throws \Exception If the request fails.
      */
     public function verifyLicense(array $data = [])
     {
         try {
+            Validator::validateInquiryRequest($data, ['licenseCode', 'productId']);
             $request = $this->adapter->post("software/v1/license/verify", $data);
             return ResponseFormatter::formatResponse($request->getBody());
+        } catch (MissingArguements $e) {
+            return ResponseFormatter::formatErrorResponse($e->getMessage(), 400);
+        } catch (InvalidContentType $e) {
+            return ResponseFormatter::formatErrorResponse($e->getMessage(), 400);
         } catch (RequestException $e) {
             return $this->handleException($e);
         }
     }
 
     /**
-     * Handle API exceptions.
+     * Handle API request exceptions.
      *
-     * This method catches API request exceptions and formats them
-     * into a structured error response.
+     * Processes and formats exceptions that occur during API requests,
+     * returning a structured error response.
      *
      * @param RequestException $e The caught exception.
-     * @return array The formatted error response.
+     * @return array Formatted error response with status code.
      */
     private function handleException(RequestException $e)
     {
@@ -78,7 +85,7 @@ class SoftwareLicenseCode implements ServiceInterface
 
         if ($responseBody) {
             $errorData = json_decode($responseBody, true);
-            $errorMessage = $errorData['message'] ?? 'An unexpected error occurred.';
+            $errorMessage = $errorData['messages'] ?? 'An error occurred';
             return ResponseFormatter::formatErrorResponse($errorMessage, $statusCode);
         }
 

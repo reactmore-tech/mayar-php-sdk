@@ -6,8 +6,9 @@ use ReactMoreTech\MayarHeadlessAPI\Adapter\AdapterInterface;
 use ReactMoreTech\MayarHeadlessAPI\Helper\ResponseFormatter;
 use ReactMoreTech\MayarHeadlessAPI\Services\ServiceInterface;
 use ReactMoreTech\MayarHeadlessAPI\Services\Traits\BodyAccessorTrait;
-use ReactMoreTech\MayarHeadlessAPI\Helper\Validations\MainValidator;
 use ReactMoreTech\MayarHeadlessAPI\Helper\Validations\Validator;
+use ReactMoreTech\MayarHeadlessAPI\Exceptions\InvalidContentType;
+use ReactMoreTech\MayarHeadlessAPI\Exceptions\MissingArguements;
 use GuzzleHttp\Exception\RequestException;
 
 /**
@@ -40,18 +41,28 @@ class Products implements ServiceInterface
     }
 
     /**
-     * Retrieve a list of product.
+     * Retrieve a paginated list of product.
      *
-     * @param array $data Contains optional parameters such as 'page', 'pageSize', search.
-     * @return array The formatted API response containing prodcut data.
+     * This method fetches a list of product from the API. It supports optional
+     * pagination parameters such as 'page' and 'pageSize'.
+     *
+     * @param array $data Optional parameters:
+     *  - 'search' (string) Query to search Product.
+     *  - 'page' (int) Page number.
+     *  - 'pageSize' (int) Number of items per page.
+     * @return ResponseFormatter Formatted API response.
      * @throws \Exception If the request fails.
      */
     public function getList(array $data = [])
     {
         try {
-            MainValidator::validateContentType($data);
+            Validator::validateArrayRequest($data);
             $request = $this->adapter->get('hl/v1/product', $data);
             return ResponseFormatter::formatResponse($request->getBody());
+        } catch (MissingArguements $e) {
+            return ResponseFormatter::formatErrorResponse($e->getMessage(), 400);
+        } catch (InvalidContentType $e) {
+            return ResponseFormatter::formatErrorResponse($e->getMessage(), 400);
         } catch (RequestException $e) {
             return $this->handleException($e);
         }
@@ -60,8 +71,15 @@ class Products implements ServiceInterface
     /**
      * Retrieve a list of product with type filter.
      *
-     * @param array $data Contains optional parameters such as 'page', dan 'pageSize'.
-     * @return array The formatted API response containing prodcut data.
+     * This method fetches a list of product from the API. It supports optional
+     * pagination parameters such as 'page' and 'pageSize'.
+     *
+     * @param array $data Required parameters:
+     *  - 'event' (string) Event Type.
+     *  Optional parameters:
+     *  - 'page' (int) Page number.
+     *  - 'pageSize' (int) Number of items per page.
+     * @return ResponseFormatter Formatted API response.
      * @throws \Exception If the request fails.
      */
     public function getListFilter(array $data = [])
@@ -70,24 +88,34 @@ class Products implements ServiceInterface
             Validator::validateInquiryRequest($data, ['event']);
             $request = $this->adapter->get("hl/v1/product/type/{$data['event']}", $data);
             return ResponseFormatter::formatResponse($request->getBody());
+        } catch (MissingArguements $e) {
+            return ResponseFormatter::formatErrorResponse($e->getMessage(), 400);
+        } catch (InvalidContentType $e) {
+            return ResponseFormatter::formatErrorResponse($e->getMessage(), 400);
         } catch (RequestException $e) {
             return $this->handleException($e);
         }
     }
 
     /**
-     * Retrieve a list of product with type filter.
+     * Get Product Detail by ID.
      *
-     * @param array $data Contains optional parameters such as 'page', dan 'pageSize'.
-     * @return array The formatted API response containing prodcut data.
-     * @throws \Exception If the request fails.
+     * Retrieves the details of a specific product by its unique identifier.
+     *
+     * @param string $couponId Required parameters (string).
+     * @return ResponseFormatter Formatted API response.
+     * @throws \Exception If validation fails or the request encounters an error.
      */
-    public function getDetail(array $data = [])
+    public function getDetail(string $productId = null)
     {
         try {
-            Validator::validateInquiryRequest($data, ['id']);
-            $request = $this->adapter->get("hl/v1/product/{$data['id']}");
+            Validator::validateSingleArgument($productId, 'productId');
+            $request = $this->adapter->get("hl/v1/product/{$productId}");
             return ResponseFormatter::formatResponse($request->getBody());
+        } catch (MissingArguements $e) {
+            return ResponseFormatter::formatErrorResponse($e->getMessage(), 400);
+        } catch (InvalidContentType $e) {
+            return ResponseFormatter::formatErrorResponse($e->getMessage(), 400);
         } catch (RequestException $e) {
             return $this->handleException($e);
         }
@@ -97,7 +125,7 @@ class Products implements ServiceInterface
      * Change Status Product.
      *
      * @param array $data need array with field 'id', 'status' status (open/close).
-     * @return array The formatted API response containing prodcut data.
+     * @return ResponseFormatter Formatted API response.
      * @throws \Exception If the request fails.
      */
     public function changeStatus(array $data = [])
@@ -106,6 +134,10 @@ class Products implements ServiceInterface
             Validator::validateInquiryRequest($data, ['id', 'status']);
             $request = $this->adapter->get("hl/v1/product/{$data['status']}/{$data['id']}");
             return ResponseFormatter::formatResponse($request->getBody());
+        } catch (MissingArguements $e) {
+            return ResponseFormatter::formatErrorResponse($e->getMessage(), 400);
+        } catch (InvalidContentType $e) {
+            return ResponseFormatter::formatErrorResponse($e->getMessage(), 400);
         } catch (RequestException $e) {
             return $this->handleException($e);
         }
@@ -114,6 +146,9 @@ class Products implements ServiceInterface
 
     /**
      * Handle API request exceptions.
+     *
+     * Processes and formats exceptions that occur during API requests,
+     * returning a structured error response.
      *
      * @param RequestException $e The caught exception.
      * @return array Formatted error response with status code.

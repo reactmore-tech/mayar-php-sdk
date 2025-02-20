@@ -6,6 +6,9 @@ use ReactMoreTech\MayarHeadlessAPI\Adapter\AdapterInterface;
 use ReactMoreTech\MayarHeadlessAPI\Helper\ResponseFormatter;
 use ReactMoreTech\MayarHeadlessAPI\Services\ServiceInterface;
 use ReactMoreTech\MayarHeadlessAPI\Services\Traits\BodyAccessorTrait;
+use ReactMoreTech\MayarHeadlessAPI\Helper\Validations\Validator;
+use ReactMoreTech\MayarHeadlessAPI\Exceptions\InvalidContentType;
+use ReactMoreTech\MayarHeadlessAPI\Exceptions\MissingArguements;
 use GuzzleHttp\Exception\RequestException;
 
 /**
@@ -30,6 +33,8 @@ class Customer implements ServiceInterface
     /**
      * Customer constructor.
      *
+     * Initializes the Customer service with the provided HTTP adapter.
+     *
      * @param AdapterInterface $adapter HTTP adapter instance.
      */
     public function __construct(AdapterInterface $adapter)
@@ -38,17 +43,27 @@ class Customer implements ServiceInterface
     }
 
     /**
-     * Retrieve a list of customers.
+     * Retrieve a paginated list of customers.
      *
-     * @param array $data Contains optional parameters such as 'page' and 'pageSize'.
-     * @return array The formatted API response containing customer data.
+     * This method fetches a list of customers from the API. It supports optional
+     * pagination parameters such as 'page' and 'pageSize'.
+     *
+     * @param array $data Optional parameters:
+     *  - 'page' (int) Page number.
+     *  - 'pageSize' (int) Number of items per page.
+     * @return ResponseFormatter Formatted API response.
      * @throws \Exception If the request fails.
      */
     public function getList(array $data = [])
     {
         try {
+            Validator::validateArrayRequest($data);
             $request = $this->adapter->get('hl/v1/customer', $data);
             return ResponseFormatter::formatResponse($request->getBody());
+        } catch (MissingArguements $e) {
+            return ResponseFormatter::formatErrorResponse($e->getMessage(), 400);
+        } catch (InvalidContentType $e) {
+            return ResponseFormatter::formatErrorResponse($e->getMessage(), 400);
         } catch (RequestException $e) {
             return $this->handleException($e);
         }
@@ -57,16 +72,24 @@ class Customer implements ServiceInterface
     /**
      * Generate a magic link for customer login.
      *
-     * Sends a magic link to the customer's email to allow login to the customer portal.
+     * Sends a magic link to the customer's email, allowing them to log in to
+     * the customer portal without a password.
      *
-     * @param string|null $email Customer email to receive the magic link.
-     * @return array The formatted API response.
+     * @param array $data Required parameter:
+     *  - 'email' (string) Customer's email address.
+     * @return ResponseFormatter Formatted API response.
+     * @throws \Exception If validation fails or the request encounters an error.
      */
-    public function createMagicLink(string $email = null)
+    public function createMagicLink(array $data = [])
     {
         try {
-            $request = $this->adapter->post("hl/v1/customer/login/portal", ['email' => $email]);
+            Validator::validateInquiryRequest($data, ['email']);
+            $request = $this->adapter->post("hl/v1/customer/login/portal", $data);
             return ResponseFormatter::formatResponse($request->getBody());
+        } catch (MissingArguements $e) {
+            return ResponseFormatter::formatErrorResponse($e->getMessage(), 400);
+        } catch (InvalidContentType $e) {
+            return ResponseFormatter::formatErrorResponse($e->getMessage(), 400);
         } catch (RequestException $e) {
             return $this->handleException($e);
         }
@@ -75,14 +98,25 @@ class Customer implements ServiceInterface
     /**
      * Create a new customer record.
      *
-     * @param array $data Contains required fields: 'name' (string), 'email' (string), and 'mobile' (string).
-     * @return array The formatted API response.
+     * Registers a new customer with the provided details.
+     *
+     * @param array $data Required parameters:
+     *  - 'name' (string) Customer's full name.
+     *  - 'email' (string) Customer's email address.
+     *  - 'mobile' (string) Customer's mobile phone number.
+     * @return ResponseFormatter Formatted API response.
+     * @throws \Exception If validation fails or the request encounters an error.
      */
     public function create(array $data = [])
     {
         try {
+            Validator::validateInquiryRequest($data, ['name', 'email', 'mobile']);
             $request = $this->adapter->post("hl/v1/customer/create", $data);
             return ResponseFormatter::formatResponse($request->getBody());
+        } catch (MissingArguements $e) {
+            return ResponseFormatter::formatErrorResponse($e->getMessage(), 400);
+        } catch (InvalidContentType $e) {
+            return ResponseFormatter::formatErrorResponse($e->getMessage(), 400);
         } catch (RequestException $e) {
             return $this->handleException($e);
         }
@@ -91,14 +125,24 @@ class Customer implements ServiceInterface
     /**
      * Update an existing customer record.
      *
-     * @param array $data Contains required fields: 'fromEmail' (string) and 'toEmail' (string).
-     * @return array The formatted API response.
+     * Updates the email address of an existing customer.
+     *
+     * @param array $data Required parameters:
+     *  - 'fromEmail' (string) Current email address.
+     *  - 'toEmail' (string) New email address.
+     * @return ResponseFormatter Formatted API response.
+     * @throws \Exception If the request fails.
      */
     public function update(array $data = [])
     {
         try {
+            Validator::validateInquiryRequest($data, ['fromEmail', 'toEmail']);
             $request = $this->adapter->post("hl/v1/customer/update", $data);
             return ResponseFormatter::formatResponse($request->getBody());
+        } catch (MissingArguements $e) {
+            return ResponseFormatter::formatErrorResponse($e->getMessage(), 400);
+        } catch (InvalidContentType $e) {
+            return ResponseFormatter::formatErrorResponse($e->getMessage(), 400);
         } catch (RequestException $e) {
             return $this->handleException($e);
         }
@@ -106,6 +150,9 @@ class Customer implements ServiceInterface
 
     /**
      * Handle API request exceptions.
+     *
+     * Processes and formats exceptions that occur during API requests,
+     * returning a structured error response.
      *
      * @param RequestException $e The caught exception.
      * @return array Formatted error response with status code.

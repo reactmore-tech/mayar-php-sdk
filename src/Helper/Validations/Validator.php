@@ -9,4 +9,29 @@ class Validator
         MainValidator::validateContentType($request);
         MainValidator::validateContentFields($request, $fields);
     }
+
+    public static function validateArrayRequest($request)
+    {
+        MainValidator::validateContentType($request);
+    }
+
+    public static function validateCreateCoupon(array $payload)
+    {
+        MainValidator::validateContentFields($payload, ['name', 'discount']);
+        MainValidator::validateNestedFields($payload, 'discount', [
+            'discountType',
+            'eligibleCustomerType',
+            'minimumPurchase',
+            'value',
+            'totalCoupons'
+        ]);
+        if (!empty($payload['coupon'])) {
+            MainValidator::validateNestedFields($payload, 'coupon', ['type']);
+        }
+    }
+
+    public static function validateSingleArgument($argument, $fieldName)
+    {
+        MainValidator::validateSingleArgument($argument, $fieldName);
+    }
 }

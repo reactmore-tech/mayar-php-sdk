@@ -6,6 +6,9 @@ use ReactMoreTech\MayarHeadlessAPI\Adapter\AdapterInterface;
 use ReactMoreTech\MayarHeadlessAPI\Helper\ResponseFormatter;
 use ReactMoreTech\MayarHeadlessAPI\Services\ServiceInterface;
 use ReactMoreTech\MayarHeadlessAPI\Services\Traits\BodyAccessorTrait;
+use ReactMoreTech\MayarHeadlessAPI\Helper\Validations\Validator;
+use ReactMoreTech\MayarHeadlessAPI\Exceptions\InvalidContentType;
+use ReactMoreTech\MayarHeadlessAPI\Exceptions\MissingArguements;
 use GuzzleHttp\Exception\RequestException;
 
 /**
@@ -30,7 +33,7 @@ class SaaSMembershipLicense implements ServiceInterface
     private $adapter;
 
     /**
-     * SaaS Membership License constructor.
+     * SaaS Membership License Service constructor.
      *
      * @param AdapterInterface $adapter HTTP adapter instance.
      */
@@ -47,19 +50,22 @@ class SaaSMembershipLicense implements ServiceInterface
      * the response will contain its details, including status, expiration date,
      * and associated customer information.
      *
-     * @param array $data An associative array containing:
-     *                    - licenseCode (string): The license code to verify.
-     *                    - productId (string): The product ID associated with the license.
-     *
-     * @return array The response containing verification details.
-     *
-     * @throws RequestException If the request fails due to network issues or API errors.
+     * @param array $data Required parameters:
+     *  - 'licenseCode' (string) The license code to verify.
+     *  - 'productId' (string) The product ID associated with the license.
+     * @return ResponseFormatter Formatted API response.
+     * @throws \Exception If the request fails.
      */
     public function verifyLicense(array $data = [])
     {
         try {
+            Validator::validateInquiryRequest($data, ['licenseCode', 'productId']);
             $request = $this->adapter->post("saas/v1/license/verify", $data);
             return ResponseFormatter::formatResponse($request->getBody());
+        } catch (MissingArguements $e) {
+            return ResponseFormatter::formatErrorResponse($e->getMessage(), 400);
+        } catch (InvalidContentType $e) {
+            return ResponseFormatter::formatErrorResponse($e->getMessage(), 400);
         } catch (RequestException $e) {
             return $this->handleException($e);
         }
@@ -70,20 +76,23 @@ class SaaSMembershipLicense implements ServiceInterface
      *
      * This endpoint is used to activate a license by providing the license code and product ID.
      * By performing this action, the status of the license code will change to ACTIVE.
-     *
-     * @param array $data An associative array containing:
-     *                    - licenseCode (string): The license code to verify.
-     *                    - productId (string): The product ID associated with the license.
-     *
-     * @return array The response containing verification details.
-     *
-     * @throws RequestException If the request fails due to network issues or API errors.
+     * 
+     * @param array $data Required parameters:
+     *  - 'licenseCode' (string) The license code to verify.
+     *  - 'productId' (string) The product ID associated with the license.
+     * @return ResponseFormatter Formatted API response.
+     * @throws \Exception If the request fails.
      */
     public function activateLicense(array $data = [])
     {
         try {
+            Validator::validateInquiryRequest($data, ['licenseCode', 'productId']);
             $request = $this->adapter->post("saas/v1/license/activate", $data);
             return ResponseFormatter::formatResponse($request->getBody());
+        } catch (MissingArguements $e) {
+            return ResponseFormatter::formatErrorResponse($e->getMessage(), 400);
+        } catch (InvalidContentType $e) {
+            return ResponseFormatter::formatErrorResponse($e->getMessage(), 400);
         } catch (RequestException $e) {
             return $this->handleException($e);
         }
@@ -95,33 +104,35 @@ class SaaSMembershipLicense implements ServiceInterface
      * This endpoint is used to deactivate a license by providing the license code and product ID.
      * By performing this action, the status of the license code will change to INACTIVE.
      *
-     * @param array $data An associative array containing:
-     *                    - licenseCode (string): The license code to verify.
-     *                    - productId (string): The product ID associated with the license.
-     *
-     * @return array The response containing verification details.
-     *
-     * @throws RequestException If the request fails due to network issues or API errors.
+     * @param array $data Required parameters:
+     *  - 'licenseCode' (string) The license code to verify.
+     *  - 'productId' (string) The product ID associated with the license.
+     * @return ResponseFormatter Formatted API response.
+     * @throws \Exception If the request fails.
      */
     public function deactivateLicense(array $data = [])
     {
         try {
+            Validator::validateInquiryRequest($data, ['licenseCode', 'productId']);
             $request = $this->adapter->post("saas/v1/license/deactivate", $data);
             return ResponseFormatter::formatResponse($request->getBody());
+        } catch (MissingArguements $e) {
+            return ResponseFormatter::formatErrorResponse($e->getMessage(), 400);
+        } catch (InvalidContentType $e) {
+            return ResponseFormatter::formatErrorResponse($e->getMessage(), 400);
         } catch (RequestException $e) {
             return $this->handleException($e);
         }
     }
 
     /**
-     * Handle API exceptions.
+     * Handle API request exceptions.
      *
-     * This method processes API errors, extracting meaningful messages and
-     * returning a structured response to the user.
+     * Processes and formats exceptions that occur during API requests,
+     * returning a structured error response.
      *
-     * @param RequestException $e The exception thrown during the API request.
-     *
-     * @return array The formatted error response including status code and message.
+     * @param RequestException $e The caught exception.
+     * @return array Formatted error response with status code.
      */
     private function handleException(RequestException $e)
     {
@@ -131,7 +142,7 @@ class SaaSMembershipLicense implements ServiceInterface
 
         if ($responseBody) {
             $errorData = json_decode($responseBody, true);
-            $errorMessage = $errorData['message'] ?? 'An unexpected error occurred.';
+            $errorMessage = $errorData['messages'] ?? 'An error occurred';
             return ResponseFormatter::formatErrorResponse($errorMessage, $statusCode);
         }
 

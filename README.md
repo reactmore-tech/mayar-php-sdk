@@ -11,7 +11,7 @@ You need api key to used this API register in [Mayar.id](https://web.mayar.id/si
 ## Installation
 
 ```cli
-composer require reactmore-tech/mayar-headless-api
+composer require reactmore-tech/mayar-php-sdk
 ```
 
 ## Usage

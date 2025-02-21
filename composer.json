@@ -1,13 +1,13 @@
 {
-    "name": "reactmore-tech/mayar-headless-api",
-    "description": "[unofficial] Mayar.id Headless API | https://mayar.id",
+    "name": "reactmore-tech/mayar-php-sdk",
+    "description": "About [unofficial] Mayar.id Payment API Client for PHP | https://mayar.id",
     "license": "MIT",
     "keywords": [
         "Mayar",
         "mayar.id",
         "Mayar Payment Gateway"
     ],
-    "homepage": "https://github.com/reactmore-tech/mayar-headless-api",
+    "homepage": "https://github.com/reactmore-tech/mayar-php-sdk",
     "type": "library",
     "minimum-stability": "stable",
     "require": {

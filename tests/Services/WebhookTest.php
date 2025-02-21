@@ -4,7 +4,7 @@ namespace ReactMoreTech\MayarHeadlessAPI\Tests\Services;
 
 use ReactMoreTech\MayarHeadlessAPI\Tests\TestCase;
 use ReactMoreTech\MayarHeadlessAPI\Services\V1\WebhookServices;
-use ReactMoreTech\MayarHeadlessAPI\Helper\ApiResponse;
+use ReactMoreTech\MayarHeadlessAPI\Formatter\Response;
 
 /**
  * Test cases for Webhook Services.
@@ -20,8 +20,8 @@ class WebhookTest extends TestCase
     {
         $result = $this->requestMock->webhookServices()->getWebhookHistory();
 
-        // Ensure the response is an instance of ApiResponse
-        $this->assertInstanceOf(ApiResponse::class, $result);
+        // Ensure the response is an instance of Response
+        $this->assertInstanceOf(Response::class, $result);
 
         // Convert response to array format
         $responseArray = $result->toArray();
@@ -46,8 +46,8 @@ class WebhookTest extends TestCase
 
         $result = $this->requestMock->webhookServices()->setWebhookURL($validURL);
 
-        // Ensure the response is an instance of ApiResponse
-        $this->assertInstanceOf(ApiResponse::class, $result);
+        // Ensure the response is an instance of Response
+        $this->assertInstanceOf(Response::class, $result);
 
         $responseArray = $result->toArray();
 
@@ -71,8 +71,8 @@ class WebhookTest extends TestCase
 
         $result = $this->requestMock->webhookServices()->setWebhookURL($invalidURL);
 
-        // Ensure the response is an instance of ApiResponse
-        $this->assertInstanceOf(ApiResponse::class, $result);
+        // Ensure the response is an instance of Response
+        $this->assertInstanceOf(Response::class, $result);
 
         $responseArray = $result->toArray();
 

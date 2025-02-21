@@ -7,7 +7,6 @@ use GuzzleHttp\Exception\RequestException;
 use InvalidArgumentException;
 use Psr\Http\Message\ResponseInterface;
 use ReactMoreTech\MayarHeadlessAPI\Auth\Auth;
-use ReactMoreTech\MayarHeadlessAPI\Exceptions\ResponseException;
 
 /**
  * The Guzzle adapter class provides an implementation of the Adapter interface using the Guzzle HTTP client library.
@@ -96,7 +95,7 @@ class Guzzle implements AdapterInterface
      * @param array $data The request payload.
      * @param array $headers The HTTP request headers.
      * @throws InvalidArgumentException If an invalid HTTP request method is specified.
-     * @throws ResponseException If an error occurs while sending the HTTP request.
+     * @throws RequestException If an error occurs while sending the HTTP request.
      * @return mixed
      */
     public function request(string $method, string $uri, array $data = [], array $headers = [])

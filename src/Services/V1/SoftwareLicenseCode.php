@@ -3,12 +3,11 @@
 namespace ReactMoreTech\MayarHeadlessAPI\Services\V1;
 
 use ReactMoreTech\MayarHeadlessAPI\Adapter\AdapterInterface;
-use ReactMoreTech\MayarHeadlessAPI\Helper\ResponseFormatter;
+use ReactMoreTech\MayarHeadlessAPI\Formatter\ResponseFormatter;
 use ReactMoreTech\MayarHeadlessAPI\Services\ServiceInterface;
 use ReactMoreTech\MayarHeadlessAPI\Services\Traits\BodyAccessorTrait;
 use ReactMoreTech\MayarHeadlessAPI\Helper\Validations\Validator;
-use ReactMoreTech\MayarHeadlessAPI\Exceptions\InvalidContentType;
-use ReactMoreTech\MayarHeadlessAPI\Exceptions\MissingArguements;
+use ReactMoreTech\MayarHeadlessAPI\Exceptions\BaseException;
 use GuzzleHttp\Exception\RequestException;
 
 /**
@@ -59,10 +58,8 @@ class SoftwareLicenseCode implements ServiceInterface
             Validator::validateInquiryRequest($data, ['licenseCode', 'productId']);
             $request = $this->adapter->post("software/v1/license/verify", $data);
             return ResponseFormatter::formatResponse($request->getBody());
-        } catch (MissingArguements $e) {
-            return ResponseFormatter::formatErrorResponse($e->getMessage(), 400);
-        } catch (InvalidContentType $e) {
-            return ResponseFormatter::formatErrorResponse($e->getMessage(), 400);
+        } catch (BaseException $e) {
+            return ResponseFormatter::formatErrorResponse($e->getMessage(), $e->getCode());
         } catch (RequestException $e) {
             return $this->handleException($e);
         }

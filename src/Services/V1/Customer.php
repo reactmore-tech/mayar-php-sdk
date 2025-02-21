@@ -3,13 +3,12 @@
 namespace ReactMoreTech\MayarHeadlessAPI\Services\V1;
 
 use ReactMoreTech\MayarHeadlessAPI\Adapter\AdapterInterface;
-use ReactMoreTech\MayarHeadlessAPI\Helper\ResponseFormatter;
+use ReactMoreTech\MayarHeadlessAPI\Formatter\ResponseFormatter;
 use ReactMoreTech\MayarHeadlessAPI\Services\ServiceInterface;
 use ReactMoreTech\MayarHeadlessAPI\Services\Traits\BodyAccessorTrait;
 use ReactMoreTech\MayarHeadlessAPI\Helper\Validations\Validator;
-use ReactMoreTech\MayarHeadlessAPI\Exceptions\InvalidContentType;
-use ReactMoreTech\MayarHeadlessAPI\Exceptions\MissingArguements;
 use GuzzleHttp\Exception\RequestException;
+use ReactMoreTech\MayarHeadlessAPI\Exceptions\BaseException;
 
 /**
  * Customer Service for Mayar Headless API V1
@@ -54,16 +53,14 @@ class Customer implements ServiceInterface
      * @return ResponseFormatter Formatted API response.
      * @throws \Exception If the request fails.
      */
-    public function getList(array $data = [])
+    public function getList($data = [])
     {
         try {
             Validator::validateArrayRequest($data);
             $request = $this->adapter->get('hl/v1/customer', $data);
             return ResponseFormatter::formatResponse($request->getBody());
-        } catch (MissingArguements $e) {
-            return ResponseFormatter::formatErrorResponse($e->getMessage(), 400);
-        } catch (InvalidContentType $e) {
-            return ResponseFormatter::formatErrorResponse($e->getMessage(), 400);
+        } catch (BaseException $e) {
+            return ResponseFormatter::formatErrorResponse($e->getMessage(), $e->getCode());
         } catch (RequestException $e) {
             return $this->handleException($e);
         }
@@ -86,10 +83,8 @@ class Customer implements ServiceInterface
             Validator::validateInquiryRequest($data, ['email']);
             $request = $this->adapter->post("hl/v1/customer/login/portal", $data);
             return ResponseFormatter::formatResponse($request->getBody());
-        } catch (MissingArguements $e) {
-            return ResponseFormatter::formatErrorResponse($e->getMessage(), 400);
-        } catch (InvalidContentType $e) {
-            return ResponseFormatter::formatErrorResponse($e->getMessage(), 400);
+        } catch (BaseException $e) {
+            return ResponseFormatter::formatErrorResponse($e->getMessage(), $e->getCode());
         } catch (RequestException $e) {
             return $this->handleException($e);
         }
@@ -113,10 +108,8 @@ class Customer implements ServiceInterface
             Validator::validateInquiryRequest($data, ['name', 'email', 'mobile']);
             $request = $this->adapter->post("hl/v1/customer/create", $data);
             return ResponseFormatter::formatResponse($request->getBody());
-        } catch (MissingArguements $e) {
-            return ResponseFormatter::formatErrorResponse($e->getMessage(), 400);
-        } catch (InvalidContentType $e) {
-            return ResponseFormatter::formatErrorResponse($e->getMessage(), 400);
+        } catch (BaseException $e) {
+            return ResponseFormatter::formatErrorResponse($e->getMessage(), $e->getCode());
         } catch (RequestException $e) {
             return $this->handleException($e);
         }
@@ -139,10 +132,8 @@ class Customer implements ServiceInterface
             Validator::validateInquiryRequest($data, ['fromEmail', 'toEmail']);
             $request = $this->adapter->post("hl/v1/customer/update", $data);
             return ResponseFormatter::formatResponse($request->getBody());
-        } catch (MissingArguements $e) {
-            return ResponseFormatter::formatErrorResponse($e->getMessage(), 400);
-        } catch (InvalidContentType $e) {
-            return ResponseFormatter::formatErrorResponse($e->getMessage(), 400);
+        } catch (BaseException $e) {
+            return ResponseFormatter::formatErrorResponse($e->getMessage(), $e->getCode());
         } catch (RequestException $e) {
             return $this->handleException($e);
         }

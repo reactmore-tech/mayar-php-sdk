@@ -3,9 +3,11 @@
 namespace ReactMoreTech\MayarHeadlessAPI\Services\V1;
 
 use ReactMoreTech\MayarHeadlessAPI\Adapter\AdapterInterface;
-use ReactMoreTech\MayarHeadlessAPI\Helper\ResponseFormatter;
+use ReactMoreTech\MayarHeadlessAPI\Formatter\ResponseFormatter;
 use ReactMoreTech\MayarHeadlessAPI\Services\ServiceInterface;
 use ReactMoreTech\MayarHeadlessAPI\Services\Traits\BodyAccessorTrait;
+use ReactMoreTech\MayarHeadlessAPI\Helper\Validations\Validator;
+use ReactMoreTech\MayarHeadlessAPI\Exceptions\BaseException;
 use GuzzleHttp\Exception\RequestException;
 
 /**
@@ -37,18 +39,32 @@ class WebhookServices implements ServiceInterface
         $this->adapter = $adapter;
     }
 
+
     /**
-     * Retrieve webhook history.
+     * Retrieve a paginated list of Webhook History.
      *
-     * @param array $data Query parameters such as page, pageSize, status, type, etc.
-     * @return array The response containing webhook history data.
-     * @throws \Exception If request fails.
+     * This method fetches a list of Webhook History from the API. It supports optional
+     * pagination parameters such as 'page' and 'pageSize'.
+     *
+     * @param array $payload Exyta parameters:
+     *  - 'page' (int) Page number.
+     *  - 'pageSize' (int) Number of items per page.
+     *  - 'startAt' (string|null) Expiration date in ISO 8601 format (e.g., "2023-05-05T09:06:14.933Z").
+     *  - 'endAt' (string|null) Expiration date in ISO 8601 format (e.g., "2023-05-05T09:06:14.933Z").
+     *  - 'status' (string) List of status: [SUCCESS, FAILED].
+     *  - 'type' (string) List of types: [payment.received].
+     *  - 'urlDestination' (string) The Customer ID associated with the Transaction.
+     * @return ResponseFormatter Formatted API response.
+     * @throws \Exception If the request fails.
      */
-    public function getWebhookHistory(array $data = [])
+    public function getWebhookHistory(array $payload = [])
     {
         try {
-            $request = $this->adapter->get('hl/v1/webhook/history', $data);
+            Validator::validateArrayRequest($payload);
+            $request = $this->adapter->get('hl/v1/webhook/history', $payload);
             return ResponseFormatter::formatResponse($request->getBody());
+        } catch (BaseException $e) {
+            return ResponseFormatter::formatErrorResponse($e->getMessage(), $e->getCode());
         } catch (RequestException $e) {
             return $this->handleException($e);
         }
@@ -57,14 +73,18 @@ class WebhookServices implements ServiceInterface
     /**
      * Register a webhook URL.
      *
-     * @param string|null $url The URL to register for webhook events.
-     * @return array The response indicating success or failure.
+     * @param string $url Required parameters (string).
+     * @return ResponseFormatter Formatted API response.
+     * @throws \Exception If the request fails.
      */
     public function setWebhookURL(string $url = null)
     {
         try {
+            Validator::validateSingleArgument($url, 'urlHook');
             $request = $this->adapter->post("hl/v1/webhook/register", ['urlHook' => $url]);
             return ResponseFormatter::formatResponse($request->getBody());
+        } catch (BaseException $e) {
+            return ResponseFormatter::formatErrorResponse($e->getMessage(), $e->getCode());
         } catch (RequestException $e) {
             return $this->handleException($e);
         }
@@ -73,40 +93,51 @@ class WebhookServices implements ServiceInterface
     /**
      * Test a registered webhook URL.
      *
-     * @param string|null $url The webhook URL to test.
-     * @return array The response indicating success or failure.
+     * @param string $url Required parameters (string).
+     * @return ResponseFormatter Formatted API response.
+     * @throws \Exception If the request fails.
      */
     public function testWebhookURL(string $url = null)
     {
         try {
+            Validator::validateSingleArgument($url, 'urlHook');
             $request = $this->adapter->post("hl/v1/webhook/test", ['urlHook' => $url]);
             return ResponseFormatter::formatResponse($request->getBody());
-        } catch (RequestException $e) {
-            return $this->handleException($e);
-        }
-    }
-    
-    /**
-     * Retry a failed webhook event.
-     *
-     * @param string|null $webhookHistoryId The ID of the webhook event to retry.
-     * @return array The response indicating success or failure.
-     */
-    public function retryWebhookURL(string $webhookHistoryId = null)
-    {
-        try {
-            $request = $this->adapter->post("hl/v1/webhook/retry", ['webhookHistoryId' => $webhookHistoryId]);
-            return ResponseFormatter::formatResponse($request->getBody());
+        } catch (BaseException $e) {
+            return ResponseFormatter::formatErrorResponse($e->getMessage(), $e->getCode());
         } catch (RequestException $e) {
             return $this->handleException($e);
         }
     }
 
     /**
-     * Handle API exceptions and format error responses.
+     * Retry a failed webhook event.
      *
-     * @param RequestException $e The exception thrown during the request.
-     * @return array The formatted error response.
+     * @param string $webhookHistoryId Required parameters (string).
+     * @return ResponseFormatter Formatted API response.
+     * @throws \Exception If the request fails.
+     */
+    public function retryWebhookURL(string $webhookHistoryId = null)
+    {
+        try {
+            Validator::validateSingleArgument($webhookHistoryId, 'webhookHistoryId');
+            $request = $this->adapter->post("hl/v1/webhook/retry", ['webhookHistoryId' => $webhookHistoryId]);
+            return ResponseFormatter::formatResponse($request->getBody());
+        } catch (BaseException $e) {
+            return ResponseFormatter::formatErrorResponse($e->getMessage(), $e->getCode());
+        } catch (RequestException $e) {
+            return $this->handleException($e);
+        }
+    }
+
+    /**
+     * Handle API request exceptions.
+     *
+     * Processes and formats exceptions that occur during API requests,
+     * returning a structured error response.
+     *
+     * @param RequestException $e The caught exception.
+     * @return array Formatted error response with status code.
      */
     private function handleException(RequestException $e)
     {

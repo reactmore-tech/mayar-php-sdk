@@ -8,4 +8,9 @@ class InvalidContentType extends BaseException
     {
         return 'Content type must be array';
     }
+
+    public function setCode()
+    {
+        return 400;
+    }
 }

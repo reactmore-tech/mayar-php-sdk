@@ -1,15 +1,13 @@
 <?php
 
-namespace ReactMoreTech\MayarHeadlessAPI\Helper;
+namespace ReactMoreTech\MayarHeadlessAPI\Formatter;
 
 use JsonSerializable;
 
 /**
  * API Response Wrapper Class
- *
- * @package ReactMoreTech\MayarHeadlessAPI\Helper
  */
-class ApiResponse implements JsonSerializable
+class Response implements JsonSerializable
 {
     /**
      * @var array $response The response data.

@@ -1,14 +1,7 @@
 <?php
 
-namespace ReactMoreTech\MayarHeadlessAPI\Helper;
+namespace ReactMoreTech\MayarHeadlessAPI\Formatter;
 
-use stdClass;
-
-/**
- * The ResponseFormatter class provides static methods to format API response.
- *
- * @package ReactMoreTech\MayarHeadlessAPI\Helper
- */
 class ResponseFormatter
 {
     /**
@@ -38,7 +31,7 @@ class ResponseFormatter
             }
         }
 
-        return new ApiResponse(array_merge([
+        return new Response(array_merge([
             'success' => true,
             'message' => $response['messages'] ?? ($message ?? 'Request berhasil'),
             'data' => $response['data'] ?? NULL,
@@ -55,7 +48,7 @@ class ResponseFormatter
      */
     public static function formatErrorResponse($message, $statusCode = 500)
     {
-        return new ApiResponse([
+        return new Response([
             'success' => false,
             'message' => $message,
             'data' => null,

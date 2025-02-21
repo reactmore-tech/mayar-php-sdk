@@ -1,7 +1,12 @@
-# Mayar.id Unofficial SDK PHP
+# Mayar.id Unofficial PHP SDK
+
 [![Latest Version](https://img.shields.io/github/release/reactmore-tech/mayar-headless-api.svg?style=flat-square)](https://github.com/reactmore-tech/mayar-headless-api/releases)
 [![MIT Licensed](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE.md)
 [![Total Downloads](https://img.shields.io/packagist/dt/reactmore-tech/mayar-headless-api.svg?style=flat-square)](https://packagist.org/packages/reactmore-tech/mayar-headless-api)
+
+## Account
+
+You need api key to used this API register in [Mayar.id](https://web.mayar.id/sign-in/coupon/AWxPjjx)
 
 ## Installation
 
@@ -34,7 +39,7 @@ $mayarId = new \ReactMoreTech\MayarHeadlessAPI\MayarProvider([
 
 See Example on [WIKI](https://github.com/reactmore-tech/mayar-headless-api/wiki):
 
-- [ ] Product
+- [X] Product
 - [ ] Invoice
 - [ ] Request Payment
 - [X] Installment

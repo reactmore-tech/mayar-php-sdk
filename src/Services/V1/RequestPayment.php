@@ -102,7 +102,7 @@ class RequestPayment implements ServiceInterface
     }
 
     /**
-     * Retrieve a list of Requset Payment.
+     * Retrieve a list of Request Payment.
      *
      * Index Single Payment Request Page
      *

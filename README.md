@@ -40,7 +40,7 @@ $mayarId = new \ReactMoreTech\MayarHeadlessAPI\MayarProvider([
 See Example on [WIKI](https://github.com/reactmore-tech/mayar-headless-api/wiki):
 
 - [X] Product
-- [ ] Invoice
+- [X] Invoice
 - [X] Request Payment
 - [X] Installment
 - [X] Discount & Coupon

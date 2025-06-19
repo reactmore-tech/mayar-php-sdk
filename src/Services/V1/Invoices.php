@@ -11,14 +11,14 @@ use ReactMoreTech\MayarHeadlessAPI\Exceptions\BaseException;
 use GuzzleHttp\Exception\RequestException;
 
 /**
- * Request Payment Service for Mayar Headless API V1
+ * Invoices Service for Mayar Headless API V1
  *
  * Endpoint where you can get or create your RequestPayment,
- * creation, updating, and re-open.
+ * creation, updating, Close, and re-open.
  *
  * @package ReactMoreTech\MayarHeadlessAPI\Services\V1
  */
-class RequestPayment implements ServiceInterface
+class Invoices implements ServiceInterface
 {
     use BodyAccessorTrait;
 
@@ -40,26 +40,29 @@ class RequestPayment implements ServiceInterface
     }
 
     /**
-     * Create Single Payment Request (Penagihan).
+     * Create Invoice.
      *
      * Create a single payment request.
      *
      * @param array $data Required parameters:
      *  - 'name' (string) Customer's full name.
      *  - 'email' (string) Customer's email address.
-     *  - 'amount' (integer) amount request payment.
      *  - 'mobile' (string) Customer's mobile phone number.
      *  - 'redirectUrl' (string) : "https://domain.com/redirect",
      *  - 'description' (string) : "kemana ini menjadi a",
      *  - 'expiredAt' (string) : "2024-02-29T09:41:09.401Z",
+     *  - 'items' (array) Daftar item, masing-masing berisi:
+     *      - 'quantity' (int) Jumlah barang.
+     *      - 'rate' (int) Harga per unit.
+     *      - 'description' (string) Deskripsi item.    
      * @return ResponseFormatter Formatted API response.
      * @throws \Exception If validation fails or the request encounters an error.
      */
     public function create(array $payload = [])
     {
         try {
-            Validator::validateInquiryRequest($payload, ['name', 'email', 'amount', 'mobile', 'redirectUrl', 'description']);
-            $request = $this->adapter->post("hl/v1/payment/create", [
+            Validator::validateInquiryRequest($payload, ['name', 'email', 'mobile', 'redirectUrl', 'description', 'items']);
+            $request = $this->adapter->post("hl/v1/invoice/create", [
                 'json' => $payload
             ]);
             return ResponseFormatter::formatResponse($request->getBody());
@@ -71,14 +74,12 @@ class RequestPayment implements ServiceInterface
     }
 
     /**
-     * Edit Single Payment Request (Penagihan).
+     * Edit Invoice.
      *
-     * Edit a single payment request.
+     * Edit a invoice request.
      *
      * @param string $id Required parameters (string).
      * @param array $payload Required parameters:
-     *  - 'name' (string) Customer's full name.
-     *  - 'amount' (integer) amount request payment.
      *  - 'redirectUrl' (string) : "https://domain.com/redirect",
      *  - 'description' (string) : "kemana ini menjadi a",
      * @return ResponseFormatter Formatted API response.
@@ -88,9 +89,9 @@ class RequestPayment implements ServiceInterface
     {
         try {
             Validator::validateSingleArgument($id, 'id');
-            Validator::validateInquiryRequest($payload, ['name', 'amount', 'redirectUrl', 'description']);
+            Validator::validateInquiryRequest($payload, ['redirectUrl', 'description']);
             $payload['id'] = $id;
-            $request = $this->adapter->post("hl/v1/payment/edit", [
+            $request = $this->adapter->post("hl/v1/invoice/edit", [
                 'json' => $payload
             ]);
             return ResponseFormatter::formatResponse($request->getBody());
@@ -112,7 +113,7 @@ class RequestPayment implements ServiceInterface
     public function getList(array $data = [])
     {
         try {
-            $request = $this->adapter->get('hl/v1/payment', $data);
+            $request = $this->adapter->get('hl/v1/invoice', $data);
             return ResponseFormatter::formatResponse($request->getBody());
         } catch (BaseException $e) {
             return ResponseFormatter::formatErrorResponse($e->getMessage(), $e->getCode());
@@ -123,9 +124,9 @@ class RequestPayment implements ServiceInterface
 
 
     /**
-     * Sort/Filter Single Payment Request Page.
+     * Sort/Filter Invoice Data Page.
      *
-     * This method fetches a list of Payment Request from the API.
+     * This method fetches a list of Invoice from the API.
      *
      * @param string $status Required parameters (open/close).
      * @return ResponseFormatter Formatted API response.
@@ -134,9 +135,9 @@ class RequestPayment implements ServiceInterface
     public function getListFilter($data)
     {
         try {
-           
+
             Validator::validateInquiryRequest($data, ['status']);
-            $request = $this->adapter->get("hl/v1/payment?status={$data['status']}", $data);
+            $request = $this->adapter->get("hl/v1/invoice?status={$data['status']}", $data);
             return ResponseFormatter::formatResponse($request->getBody());
         } catch (BaseException $e) {
             return ResponseFormatter::formatErrorResponse($e->getMessage(), $e->getCode());
@@ -146,7 +147,7 @@ class RequestPayment implements ServiceInterface
     }
 
     /**
-     * Get Request Payment Detail by ID.
+     * Get Detail Invoice.
      *
      * Detail Single Payment Request.
      *
@@ -157,8 +158,8 @@ class RequestPayment implements ServiceInterface
     public function getDetail($transactionId = null)
     {
         try {
-            Validator::validateSingleArgument($transactionId, 'transactionId');
-            $request = $this->adapter->get("hl/v1/payment/{$transactionId}");
+            Validator::validateSingleArgument($transactionId, 'id');
+            $request = $this->adapter->get("hl/v1/invoice/{$transactionId}");
             return ResponseFormatter::formatResponse($request->getBody());
         } catch (BaseException $e) {
             return ResponseFormatter::formatErrorResponse($e->getMessage(), $e->getCode());
@@ -168,7 +169,7 @@ class RequestPayment implements ServiceInterface
     }
 
     /**
-     * Change Status Payment.
+     * Change Status of Invoice.
      *
      * @param string $status Required parameters (open/close).
      * @param string $transactionId Required parameters (string).
@@ -179,8 +180,8 @@ class RequestPayment implements ServiceInterface
     {
         try {
             Validator::validateSingleArgument($status, 'status');
-            Validator::validateSingleArgument($transactionId, 'transactionId');
-            $request = $this->adapter->get("hl/v1/payment/{$status}/{$transactionId}");
+            Validator::validateSingleArgument($transactionId, 'id');
+            $request = $this->adapter->get("hl/v1/invoice/{$status}/{$transactionId}");
             return ResponseFormatter::formatResponse($request->getBody());
         } catch (BaseException $e) {
             return ResponseFormatter::formatErrorResponse($e->getMessage(), $e->getCode());

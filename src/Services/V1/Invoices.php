@@ -78,19 +78,19 @@ class Invoices implements ServiceInterface
      *
      * Edit a invoice request.
      *
-     * @param string $transactionId Required parameters (string).
+     * @param string $id Required parameters (string).
      * @param array $payload Required parameters:
      *  - 'redirectUrl' (string) : "https://domain.com/redirect",
      *  - 'description' (string) : "kemana ini menjadi a",
      * @return ResponseFormatter Formatted API response.
      * @throws \Exception If validation fails or the request encounters an error.
      */
-    public function edit($transactionId, array $payload = [])
+    public function edit($id, array $payload = [])
     {
         try {
-            Validator::validateSingleArgument($transactionId, 'id');
+            Validator::validateSingleArgument($id, 'id');
             Validator::validateInquiryRequest($payload, ['redirectUrl', 'description']);
-            $payload['id'] = $transactionId;
+            $payload['id'] = $id;
             $request = $this->adapter->post("hl/v1/invoice/edit", [
                 'json' => $payload
             ]);

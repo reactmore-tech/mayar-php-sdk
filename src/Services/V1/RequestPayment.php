@@ -75,7 +75,7 @@ class RequestPayment implements ServiceInterface
      *
      * Edit a single payment request.
      *
-     * @param string $transactionId Required parameters (string).
+     * @param string $id Required parameters (string).
      * @param array $payload Required parameters:
      *  - 'name' (string) Customer's full name.
      *  - 'amount' (integer) amount request payment.
@@ -84,12 +84,12 @@ class RequestPayment implements ServiceInterface
      * @return ResponseFormatter Formatted API response.
      * @throws \Exception If validation fails or the request encounters an error.
      */
-    public function edit($transactionId, array $payload = [])
+    public function edit($id, array $payload = [])
     {
         try {
-            Validator::validateSingleArgument($transactionId, 'id');
+            Validator::validateSingleArgument($id, 'id');
             Validator::validateInquiryRequest($payload, ['name', 'amount', 'redirectUrl', 'description']);
-            $payload['id'] = $transactionId;
+            $payload['id'] = $id;
             $request = $this->adapter->post("hl/v1/payment/edit", [
                 'json' => $payload
             ]);

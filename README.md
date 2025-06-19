@@ -44,7 +44,7 @@ See Example on [WIKI](https://github.com/reactmore-tech/mayar-headless-api/wiki)
 - [X] Request Payment
 - [X] Installment
 - [X] Discount & Coupon
-- [ ] Cart
+- [ ] Cart (No Realease yet from api)
 - [X] Customer
 - [X] Transaction
 - [X] Webhook

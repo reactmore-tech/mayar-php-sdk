@@ -2,7 +2,7 @@
 
 [![Latest Version](https://img.shields.io/github/release/reactmore-tech/mayar-headless-api.svg?style=flat-square)](https://github.com/reactmore-tech/mayar-headless-api/releases)
 [![MIT Licensed](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE.md)
-[![Total Downloads](https://img.shields.io/packagist/dt/reactmore-tech/mayar-headless-api.svg?style=flat-square)](https://packagist.org/packages/reactmore-tech/mayar-headless-api)
+[![Total Downloads](https://img.shields.io/packagist/dt/reactmore-tech/mayar-php-sdk.svg?style=flat-square)](https://packagist.org/packages/reactmore-tech/mayar-php-sdk)
 
 ## Account
 

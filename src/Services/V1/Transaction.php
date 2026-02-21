@@ -6,6 +6,7 @@ use ReactMoreTech\MayarHeadlessAPI\Adapter\AdapterInterface;
 use ReactMoreTech\MayarHeadlessAPI\Formatter\ResponseFormatter;
 use ReactMoreTech\MayarHeadlessAPI\Services\ServiceInterface;
 use ReactMoreTech\MayarHeadlessAPI\Services\Traits\BodyAccessorTrait;
+use ReactMoreTech\MayarHeadlessAPI\Services\Traits\HandleExceptionTrait;
 use ReactMoreTech\MayarHeadlessAPI\Helper\Validations\Validator;
 use ReactMoreTech\MayarHeadlessAPI\Exceptions\BaseException;
 use GuzzleHttp\Exception\RequestException;
@@ -20,6 +21,7 @@ use GuzzleHttp\Exception\RequestException;
 class Transaction implements ServiceInterface
 {
     use BodyAccessorTrait;
+    use HandleExceptionTrait;
 
     /**
      * HTTP adapter for API communication.
@@ -126,10 +128,10 @@ class Transaction implements ServiceInterface
      * @return ResponseFormatter Formatted API response.
      * @throws \Exception If the request fails.
      */
-    public function getStaticQRCode(int $amount)
+    public function getStaticQRCode($amount)
     {
         try {
-            Validator::validateSingleArgument($amount, 'amount');
+            Validator::validateSingleArgument((string) $amount, 'amount');
             $request = $this->adapter->get("hl/v1/qrcode/static", [
                 'json' => ['amount' => $amount]
             ]);
@@ -150,10 +152,10 @@ class Transaction implements ServiceInterface
      * @return ResponseFormatter Formatted API response.
      * @throws \Exception If the request fails.
      */
-    public function getDynamicQRCode(int $amount)
+    public function getDynamicQRCode($amount)
     {
         try {
-            Validator::validateSingleArgument($amount, 'amount');
+            Validator::validateSingleArgument((string) $amount, 'amount');
             $request = $this->adapter->post("hl/v1/qrcode/create", [
                 'json' => ['amount' => $amount]
             ]);
@@ -165,27 +167,4 @@ class Transaction implements ServiceInterface
         }
     }
 
-    /**
-     * Handle API request exceptions.
-     *
-     * Processes and formats exceptions that occur during API requests,
-     * returning a structured error response.
-     *
-     * @param RequestException $e The caught exception.
-     * @return array Formatted error response with status code.
-     */
-    private function handleException(RequestException $e)
-    {
-        $response = $e->getResponse();
-        $statusCode = $response ? $response->getStatusCode() : 500;
-        $responseBody = $response ? $response->getBody()->getContents() : null;
-
-        if ($responseBody) {
-            $errorData = json_decode($responseBody, true);
-            $errorMessage = $errorData['messages'] ?? 'An error occurred';
-            return ResponseFormatter::formatErrorResponse($errorMessage, $statusCode);
-        }
-
-        return ResponseFormatter::formatErrorResponse($e->getMessage(), $statusCode);
-    }
 }

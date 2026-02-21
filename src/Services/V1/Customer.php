@@ -6,6 +6,7 @@ use ReactMoreTech\MayarHeadlessAPI\Adapter\AdapterInterface;
 use ReactMoreTech\MayarHeadlessAPI\Formatter\ResponseFormatter;
 use ReactMoreTech\MayarHeadlessAPI\Services\ServiceInterface;
 use ReactMoreTech\MayarHeadlessAPI\Services\Traits\BodyAccessorTrait;
+use ReactMoreTech\MayarHeadlessAPI\Services\Traits\HandleExceptionTrait;
 use ReactMoreTech\MayarHeadlessAPI\Helper\Validations\Validator;
 use GuzzleHttp\Exception\RequestException;
 use ReactMoreTech\MayarHeadlessAPI\Exceptions\BaseException;
@@ -21,6 +22,7 @@ use ReactMoreTech\MayarHeadlessAPI\Exceptions\BaseException;
 class Customer implements ServiceInterface
 {
     use BodyAccessorTrait;
+    use HandleExceptionTrait;
 
     /**
      * HTTP adapter for API communication.
@@ -81,7 +83,7 @@ class Customer implements ServiceInterface
     {
         try {
             Validator::validateInquiryRequest($data, ['email']);
-            $request = $this->adapter->post("hl/v1/customer/login/portal", $data);
+            $request = $this->adapter->post("hl/v1/customer/login/portal", ['json' => $data]);
             return ResponseFormatter::formatResponse($request->getBody());
         } catch (BaseException $e) {
             return ResponseFormatter::formatErrorResponse($e->getMessage(), $e->getCode());
@@ -106,7 +108,7 @@ class Customer implements ServiceInterface
     {
         try {
             Validator::validateInquiryRequest($data, ['name', 'email', 'mobile']);
-            $request = $this->adapter->post("hl/v1/customer/create", $data);
+            $request = $this->adapter->post("hl/v1/customer/create", ['json' => $data]);
             return ResponseFormatter::formatResponse($request->getBody());
         } catch (BaseException $e) {
             return ResponseFormatter::formatErrorResponse($e->getMessage(), $e->getCode());
@@ -130,7 +132,7 @@ class Customer implements ServiceInterface
     {
         try {
             Validator::validateInquiryRequest($data, ['fromEmail', 'toEmail']);
-            $request = $this->adapter->post("hl/v1/customer/update", $data);
+            $request = $this->adapter->post("hl/v1/customer/update", ['json' => $data]);
             return ResponseFormatter::formatResponse($request->getBody());
         } catch (BaseException $e) {
             return ResponseFormatter::formatErrorResponse($e->getMessage(), $e->getCode());
@@ -139,27 +141,4 @@ class Customer implements ServiceInterface
         }
     }
 
-    /**
-     * Handle API request exceptions.
-     *
-     * Processes and formats exceptions that occur during API requests,
-     * returning a structured error response.
-     *
-     * @param RequestException $e The caught exception.
-     * @return array Formatted error response with status code.
-     */
-    private function handleException(RequestException $e)
-    {
-        $response = $e->getResponse();
-        $statusCode = $response ? $response->getStatusCode() : 500;
-        $responseBody = $response ? $response->getBody()->getContents() : null;
-
-        if ($responseBody) {
-            $errorData = json_decode($responseBody, true);
-            $errorMessage = $errorData['messages'] ?? 'An error occurred';
-            return ResponseFormatter::formatErrorResponse($errorMessage, $statusCode);
-        }
-
-        return ResponseFormatter::formatErrorResponse($e->getMessage(), $statusCode);
-    }
 }

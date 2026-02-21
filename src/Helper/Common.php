@@ -9,6 +9,7 @@ class Common
         if (!empty($str)) {
             return str_replace($search, $replace, $str);
         }
+        return '';
     }
 
     public static function generateUniqId()

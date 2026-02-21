@@ -20,7 +20,7 @@ class Validator
      * @param mixed $request The request data.
      * @param array $fields Required fields.
      * @throws \ReactMoreTech\MayarHeadlessAPI\Exceptions\InvalidContentType
-     * @throws \ReactMoreTech\MayarHeadlessAPI\Exceptions\MissingArguements
+     * @throws \ReactMoreTech\MayarHeadlessAPI\Exceptions\MissingArguments
      */
     public static function validateInquiryRequest($request, $fields)
     {
@@ -45,7 +45,7 @@ class Validator
      * Ensures the required fields exist and validates nested discount and coupon fields.
      *
      * @param array $payload The request payload.
-     * @throws \ReactMoreTech\MayarHeadlessAPI\Exceptions\MissingArguements If required fields are missing.
+     * @throws \ReactMoreTech\MayarHeadlessAPI\Exceptions\MissingArguments If required fields are missing.
      */
     public static function validateCreateCoupon(array $payload)
     {
@@ -68,7 +68,7 @@ class Validator
      * Ensures required fields exist and validates nested installment fields.
      *
      * @param array $payload The request payload.
-     * @throws \ReactMoreTech\MayarHeadlessAPI\Exceptions\MissingArguements If required fields are missing.
+     * @throws \ReactMoreTech\MayarHeadlessAPI\Exceptions\MissingArguments If required fields are missing.
      */
     public static function validateCreateInstallment(array $payload)
     {
@@ -88,7 +88,7 @@ class Validator
      *
      * @param mixed $argument The argument to validate.
      * @param string $fieldName The field name for error reporting.
-     * @throws \ReactMoreTech\MayarHeadlessAPI\Exceptions\MissingArguements If the argument is empty or invalid.
+     * @throws \ReactMoreTech\MayarHeadlessAPI\Exceptions\MissingArguments If the argument is empty or invalid.
      */
     public static function validateSingleArgument($argument, $fieldName)
     {

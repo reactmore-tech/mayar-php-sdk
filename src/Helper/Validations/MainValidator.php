@@ -3,7 +3,7 @@
 namespace ReactMoreTech\MayarHeadlessAPI\Helper\Validations;
 
 use ReactMoreTech\MayarHeadlessAPI\Exceptions\InvalidContentType;
-use ReactMoreTech\MayarHeadlessAPI\Exceptions\MissingArguements;
+use ReactMoreTech\MayarHeadlessAPI\Exceptions\MissingArguments;
 
 /**
  * Main Validator for Data Validation
@@ -56,14 +56,14 @@ class MainValidator
      *
      * @param array $content The content to check.
      * @param array $fields The required fields.
-     * @throws MissingArguements If any required field is missing.
+     * @throws MissingArguments If any required field is missing.
      */
     public static function validateContentFields($content, $fields)
     {
         $missingFields = self::getMissingFields($content, $fields);
 
         if (!empty($missingFields)) {
-            throw new MissingArguements('Field ' . $missingFields[0] . ' is missing');
+            throw new MissingArguments('Field ' . $missingFields[0] . ' is missing');
         }
     }
 
@@ -75,17 +75,17 @@ class MainValidator
      * @param array $content The main array containing the nested field.
      * @param string $field The key of the nested array to validate.
      * @param array $nestedFields Required keys inside the nested array.
-     * @throws MissingArguements If any required field is missing.
+     * @throws MissingArguments If any required field is missing.
      */
     public static function validateNestedFields(array $content, string $field, array $nestedFields)
     {
         if (!isset($content[$field]) || !is_array($content[$field])) {
-            throw new MissingArguements("Field '{$field}' is missing or invalid");
+            throw new MissingArguments("Field '{$field}' is missing or invalid");
         }
 
         $missingFields = self::getMissingFields($content[$field], $nestedFields);
         if (!empty($missingFields)) {
-            throw new MissingArguements("Field '{$field}.{$missingFields[0]}' is missing");
+            throw new MissingArguments("Field '{$field}.{$missingFields[0]}' is missing");
         }
     }
 
@@ -96,12 +96,12 @@ class MainValidator
      *
      * @param mixed $argument The argument to validate.
      * @param string $fieldName The field name for error reporting.
-     * @throws MissingArguements If the argument is empty or not a string.
+     * @throws MissingArguments If the argument is empty or not a string.
      */
     public static function validateSingleArgument($argument, $fieldName)
     {
         if (empty($argument) || !is_string($argument)) {
-            throw new MissingArguements("Field '{$fieldName}' is required and must be a string.");
+            throw new MissingArguments("Field '{$fieldName}' is required and must be a string.");
         }
     }
 }

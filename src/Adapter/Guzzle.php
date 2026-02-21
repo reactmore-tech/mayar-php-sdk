@@ -42,8 +42,9 @@ class Guzzle implements AdapterInterface
 
         $this->client = new Client([
             'base_uri' => $baseURI,
-            'headers'  => $headers,
-            'Accept'   => 'application/x-www-form-urlencoded',
+            'headers' => array_merge($headers, [
+                'Accept' => 'application/json',
+            ]),
         ]);
     }
 

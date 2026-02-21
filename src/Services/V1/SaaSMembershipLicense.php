@@ -6,6 +6,7 @@ use ReactMoreTech\MayarHeadlessAPI\Adapter\AdapterInterface;
 use ReactMoreTech\MayarHeadlessAPI\Formatter\ResponseFormatter;
 use ReactMoreTech\MayarHeadlessAPI\Services\ServiceInterface;
 use ReactMoreTech\MayarHeadlessAPI\Services\Traits\BodyAccessorTrait;
+use ReactMoreTech\MayarHeadlessAPI\Services\Traits\HandleExceptionTrait;
 use ReactMoreTech\MayarHeadlessAPI\Helper\Validations\Validator;
 use ReactMoreTech\MayarHeadlessAPI\Exceptions\BaseException;
 use GuzzleHttp\Exception\RequestException;
@@ -23,6 +24,7 @@ use GuzzleHttp\Exception\RequestException;
 class SaaSMembershipLicense implements ServiceInterface
 {
     use BodyAccessorTrait;
+    use HandleExceptionTrait;
 
     /**
      * HTTP adapter for API communication.
@@ -59,7 +61,7 @@ class SaaSMembershipLicense implements ServiceInterface
     {
         try {
             Validator::validateInquiryRequest($data, ['licenseCode', 'productId']);
-            $request = $this->adapter->post("saas/v1/license/verify", $data);
+            $request = $this->adapter->post("saas/v1/license/verify", ['json' => $data]);
             return ResponseFormatter::formatResponse($request->getBody());
         } catch (BaseException $e) {
             return ResponseFormatter::formatErrorResponse($e->getMessage(), $e->getCode());
@@ -84,7 +86,7 @@ class SaaSMembershipLicense implements ServiceInterface
     {
         try {
             Validator::validateInquiryRequest($data, ['licenseCode', 'productId']);
-            $request = $this->adapter->post("saas/v1/license/activate", $data);
+            $request = $this->adapter->post("saas/v1/license/activate", ['json' => $data]);
             return ResponseFormatter::formatResponse($request->getBody());
         } catch (BaseException $e) {
             return ResponseFormatter::formatErrorResponse($e->getMessage(), $e->getCode());
@@ -109,7 +111,7 @@ class SaaSMembershipLicense implements ServiceInterface
     {
         try {
             Validator::validateInquiryRequest($data, ['licenseCode', 'productId']);
-            $request = $this->adapter->post("saas/v1/license/deactivate", $data);
+            $request = $this->adapter->post("saas/v1/license/deactivate", ['json' => $data]);
             return ResponseFormatter::formatResponse($request->getBody());
         } catch (BaseException $e) {
             return ResponseFormatter::formatErrorResponse($e->getMessage(), $e->getCode());
@@ -118,27 +120,4 @@ class SaaSMembershipLicense implements ServiceInterface
         }
     }
 
-    /**
-     * Handle API request exceptions.
-     *
-     * Processes and formats exceptions that occur during API requests,
-     * returning a structured error response.
-     *
-     * @param RequestException $e The caught exception.
-     * @return array Formatted error response with status code.
-     */
-    private function handleException(RequestException $e)
-    {
-        $response = $e->getResponse();
-        $statusCode = $response ? $response->getStatusCode() : 500;
-        $responseBody = $response ? $response->getBody()->getContents() : null;
-
-        if ($responseBody) {
-            $errorData = json_decode($responseBody, true);
-            $errorMessage = $errorData['messages'] ?? 'An error occurred';
-            return ResponseFormatter::formatErrorResponse($errorMessage, $statusCode);
-        }
-
-        return ResponseFormatter::formatErrorResponse($e->getMessage(), $statusCode);
-    }
 }

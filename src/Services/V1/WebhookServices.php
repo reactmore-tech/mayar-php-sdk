@@ -6,6 +6,7 @@ use ReactMoreTech\MayarHeadlessAPI\Adapter\AdapterInterface;
 use ReactMoreTech\MayarHeadlessAPI\Formatter\ResponseFormatter;
 use ReactMoreTech\MayarHeadlessAPI\Services\ServiceInterface;
 use ReactMoreTech\MayarHeadlessAPI\Services\Traits\BodyAccessorTrait;
+use ReactMoreTech\MayarHeadlessAPI\Services\Traits\HandleExceptionTrait;
 use ReactMoreTech\MayarHeadlessAPI\Helper\Validations\Validator;
 use ReactMoreTech\MayarHeadlessAPI\Exceptions\BaseException;
 use GuzzleHttp\Exception\RequestException;
@@ -21,6 +22,7 @@ use GuzzleHttp\Exception\RequestException;
 class WebhookServices implements ServiceInterface
 {
     use BodyAccessorTrait;
+    use HandleExceptionTrait;
 
     /**
      * HTTP adapter for API communication.
@@ -81,7 +83,7 @@ class WebhookServices implements ServiceInterface
     {
         try {
             Validator::validateSingleArgument($url, 'urlHook');
-            $request = $this->adapter->post("hl/v1/webhook/register", ['urlHook' => $url]);
+            $request = $this->adapter->post("hl/v1/webhook/register", ['json' => ['urlHook' => $url]]);
             return ResponseFormatter::formatResponse($request->getBody());
         } catch (BaseException $e) {
             return ResponseFormatter::formatErrorResponse($e->getMessage(), $e->getCode());
@@ -101,7 +103,7 @@ class WebhookServices implements ServiceInterface
     {
         try {
             Validator::validateSingleArgument($url, 'urlHook');
-            $request = $this->adapter->post("hl/v1/webhook/test", ['urlHook' => $url]);
+            $request = $this->adapter->post("hl/v1/webhook/test", ['json' => ['urlHook' => $url]]);
             return ResponseFormatter::formatResponse($request->getBody());
         } catch (BaseException $e) {
             return ResponseFormatter::formatErrorResponse($e->getMessage(), $e->getCode());
@@ -121,7 +123,7 @@ class WebhookServices implements ServiceInterface
     {
         try {
             Validator::validateSingleArgument($webhookHistoryId, 'webhookHistoryId');
-            $request = $this->adapter->post("hl/v1/webhook/retry", ['webhookHistoryId' => $webhookHistoryId]);
+            $request = $this->adapter->post("hl/v1/webhook/retry", ['json' => ['webhookHistoryId' => $webhookHistoryId]]);
             return ResponseFormatter::formatResponse($request->getBody());
         } catch (BaseException $e) {
             return ResponseFormatter::formatErrorResponse($e->getMessage(), $e->getCode());
@@ -130,27 +132,4 @@ class WebhookServices implements ServiceInterface
         }
     }
 
-    /**
-     * Handle API request exceptions.
-     *
-     * Processes and formats exceptions that occur during API requests,
-     * returning a structured error response.
-     *
-     * @param RequestException $e The caught exception.
-     * @return array Formatted error response with status code.
-     */
-    private function handleException(RequestException $e)
-    {
-        $response = $e->getResponse();
-        $statusCode = $response ? $response->getStatusCode() : 500;
-        $responseBody = $response ? $response->getBody()->getContents() : null;
-
-        if ($responseBody) {
-            $errorData = json_decode($responseBody, true);
-            $errorMessage = $errorData['messages'] ?? 'An error occurred';
-            return ResponseFormatter::formatErrorResponse($errorMessage, $statusCode);
-        }
-
-        return ResponseFormatter::formatErrorResponse($e->getMessage(), $statusCode);
-    }
 }
